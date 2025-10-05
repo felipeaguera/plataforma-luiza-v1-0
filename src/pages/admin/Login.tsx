@@ -19,7 +19,12 @@ export default function AdminLogin() {
   // Redirect if already logged in as admin
   useEffect(() => {
     if (user && !authLoading && isAdmin) {
+      setIsLoading(false);
       navigate('/admin/dashboard', { replace: true });
+    } else if (user && !authLoading && !isAdmin) {
+      // Not an admin, reset loading
+      setIsLoading(false);
+      toast.error('Acesso negado. Você não tem permissão de administrador.');
     }
   }, [user, isAdmin, authLoading, navigate]);
 
@@ -33,16 +38,22 @@ export default function AdminLogin() {
 
     setIsLoading(true);
 
-    const { error } = await signIn(email, password);
+    try {
+      const { error } = await signIn(email, password);
 
-    if (error) {
-      toast.error('Credenciais inválidas. Verifique email e senha.');
+      if (error) {
+        toast.error('Credenciais inválidas. Verifique email e senha.');
+        setIsLoading(false);
+        return;
+      }
+
+      toast.success('Login realizado com sucesso!');
+      // O redirecionamento será feito pelo useEffect quando isAdmin for atualizado
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('Erro ao fazer login. Tente novamente.');
       setIsLoading(false);
-      return;
     }
-
-    toast.success('Login realizado com sucesso!');
-    // O redirecionamento será feito pelo useEffect quando isAdmin for atualizado
   };
 
   return (
