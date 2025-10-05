@@ -42,7 +42,7 @@ export default function AdminLogin() {
     }
 
     toast.success('Login realizado com sucesso!');
-    navigate('/admin/dashboard');
+    // Navigation will be handled by useEffect when isAdmin is updated
   };
 
   return (
