@@ -10,7 +10,7 @@ import logoAguera from '@/assets/logo-aguera.jpeg';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const { signIn, user, isAdmin } = useAuth();
+  const { signIn, user, isAdmin, isLoading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -18,14 +18,14 @@ export default function AdminLogin() {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (user) {
+    if (user && !authLoading) {
       if (isAdmin) {
         navigate('/admin/dashboard', { replace: true });
       } else {
         navigate('/paciente/dashboard', { replace: true });
       }
     }
-  }, [user, isAdmin, navigate]);
+  }, [user, isAdmin, authLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,11 +46,7 @@ export default function AdminLogin() {
     }
 
     toast.success('Login realizado com sucesso!');
-    
-    // Wait a bit for auth state to update and then redirect
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
+    // Navigation will be handled by useEffect when user and isAdmin are updated
   };
 
   return (
