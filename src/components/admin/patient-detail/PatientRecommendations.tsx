@@ -236,7 +236,7 @@ export function PatientRecommendations({ patientId }: PatientRecommendationsProp
 
               if (videoId) {
                 return (
-                  <div className="aspect-video w-full">
+                  <div className="aspect-video w-full mt-4">
                     <iframe
                       width="100%"
                       height="100%"
@@ -253,11 +253,12 @@ export function PatientRecommendations({ patientId }: PatientRecommendationsProp
             }
             
             return (
-              <div className="aspect-video w-full bg-black rounded-md">
+              <div className="w-full mt-4">
                 <video
                   controls
                   autoPlay
-                  className="w-full h-full rounded-md"
+                  className="w-full rounded-md"
+                  style={{ maxHeight: '70vh' }}
                   src={viewingVideo.media_url}
                 >
                   Seu navegador não suporta a tag de vídeo.
