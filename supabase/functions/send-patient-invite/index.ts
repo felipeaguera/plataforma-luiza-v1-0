@@ -20,6 +20,9 @@ serve(async (req) => {
       throw new Error("Patient ID is required");
     }
 
+    // Get the origin URL from the request
+    const origin = req.headers.get("origin") || "https://098eb491-9a9c-4b08-ba6a-5b7f903326a2.lovableproject.com";
+
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -66,9 +69,10 @@ serve(async (req) => {
       throw tokenError;
     }
 
-    // Get the activation URL
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const activationUrl = `${supabaseUrl.replace("supabase.co", "lovableproject.com")}/paciente/ativar?token=${token}`;
+    // Get the activation URL using the origin from the request
+    const activationUrl = `${origin}/paciente/ativar?token=${token}`;
+
+    console.log("Activation URL:", activationUrl); // Log para debug
 
     // Send email
     const { error: emailError } = await resend.emails.send({
