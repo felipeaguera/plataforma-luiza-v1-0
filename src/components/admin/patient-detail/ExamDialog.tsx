@@ -4,10 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Upload } from 'lucide-react';
+import { Upload, CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 
 interface ExamDialogProps {
   open: boolean;
@@ -18,6 +23,7 @@ interface ExamDialogProps {
 export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [examDate, setExamDate] = useState<Date>();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const queryClient = useQueryClient();
@@ -50,6 +56,7 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
           file_path: filePath,
           file_name: file.name,
           file_size: file.size,
+          exam_date: examDate ? format(examDate, 'yyyy-MM-dd') : null,
           published_at: new Date().toISOString(),
         });
 
@@ -60,6 +67,7 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
       onOpenChange(false);
       setTitle('');
       setDescription('');
+      setExamDate(undefined);
       setFile(null);
     } catch (error) {
       console.error('Error uploading exam:', error);
@@ -85,6 +93,34 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
               placeholder="Ex: Mapeamento de pintas - Janeiro 2025"
               required
             />
+          </div>
+
+          <div>
+            <Label htmlFor="exam-date">Data de Realização</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal mt-2",
+                    !examDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {examDate ? format(examDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : "Selecionar data"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={examDate}
+                  onSelect={setExamDate}
+                  disabled={(date) => date > new Date()}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div>

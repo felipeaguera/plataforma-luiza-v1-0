@@ -103,6 +103,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           description: string | null
+          exam_date: string | null
           file_name: string
           file_path: string
           file_size: number | null
@@ -115,6 +116,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          exam_date?: string | null
           file_name: string
           file_path: string
           file_size?: number | null
@@ -127,6 +129,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          exam_date?: string | null
           file_name?: string
           file_path?: string
           file_size?: number | null

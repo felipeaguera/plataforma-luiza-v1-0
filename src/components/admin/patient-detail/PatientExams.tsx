@@ -120,11 +120,16 @@ export function PatientExams({ patientId }: PatientExamsProps) {
                     </div>
                     <div>
                       <h4 className="font-medium">{exam.title}</h4>
+                      {exam.exam_date && (
+                        <p className="text-sm text-muted-foreground">
+                          Data do exame: {format(new Date(exam.exam_date), "dd/MM/yyyy", { locale: ptBR })}
+                        </p>
+                      )}
                       {exam.description && (
                         <p className="text-sm text-muted-foreground">{exam.description}</p>
                       )}
                       <p className="text-xs text-muted-foreground mt-1">
-                        {format(new Date(exam.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                        Cadastrado em: {format(new Date(exam.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                       </p>
                     </div>
                   </div>
