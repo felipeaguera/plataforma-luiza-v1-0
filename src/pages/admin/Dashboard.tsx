@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,9 +6,26 @@ import { Users, Bell, LogOut } from 'lucide-react';
 import { PatientDialog } from '@/components/admin/PatientDialog';
 import logo from '@/assets/logo-aguera.jpeg';
 
+const motivationalPhrases = [
+  "Sua dedicação transforma vidas! Continue brilhando! ✨",
+  "Mulher poderosa, sua energia inspira a todos! 💪",
+  "Você é incrível e faz a diferença todos os dias! 🌟",
+  "Sua beleza interior reflete no cuidado com cada paciente! 💖",
+  "Que orgulho de tê-la aqui, mulher extraordinária! 👑",
+  "Sua força e determinação são admiráveis! 🌺",
+  "Você ilumina este espaço com sua presença! ☀️",
+  "Mulher inspiradora, seu trabalho é arte! 🎨",
+  "Continue sendo essa profissional excepcional! 🦋",
+  "Sua paixão pelo que faz é contagiante! 💫"
+];
+
 export default function AdminDashboard() {
   const { user, signOut } = useAuth();
   const [isPatientDialogOpen, setIsPatientDialogOpen] = useState(false);
+  
+  const motivationalPhrase = useMemo(() => {
+    return motivationalPhrases[Math.floor(Math.random() * motivationalPhrases.length)];
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -33,10 +50,10 @@ export default function AdminDashboard() {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-foreground mb-2">
-            Bem-vinda, {user?.user_metadata?.full_name || 'Admin'}!
+            Bem-vinda, Dr Luiza Aguera!
           </h2>
-          <p className="text-muted-foreground">
-            Gerencie pacientes, exames e comunicações da clínica
+          <p className="text-primary font-medium text-lg">
+            {motivationalPhrase}
           </p>
         </div>
 
