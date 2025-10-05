@@ -15,7 +15,7 @@ export default function AdminDashboard() {
             <h1 className="text-2xl font-bold text-foreground">Aguera Dermatologia</h1>
             <p className="text-sm text-muted-foreground">Painel Administrativo</p>
           </div>
-          <Button variant="outline" onClick={signOut}>
+          <Button variant="destructive" onClick={signOut}>
             <LogOut className="mr-2" size={16} />
             Sair
           </Button>
