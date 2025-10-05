@@ -13,6 +13,7 @@ import PatientsPage from "./pages/admin/Patients";
 import PatientDetail from "./pages/admin/PatientDetail";
 import PatientDashboard from "./pages/patient/Dashboard";
 import PatientLogin from "./pages/patient/Login";
+import PatientActivate from "./pages/patient/Activate";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/paciente/login" element={<PatientLogin />} />
+            <Route path="/paciente/ativar" element={<PatientActivate />} />
             <Route 
               path="/paciente/dashboard" 
               element={
