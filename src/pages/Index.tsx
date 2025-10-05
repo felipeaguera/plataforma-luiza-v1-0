@@ -19,15 +19,18 @@ const Index = () => {
             Dra. Luiza Aguera
           </h1>
           <p className="text-xl text-muted-foreground">
-            Sistema de gestão de pacientes e comunicação clínica
+            Plataforma de atendimento e acompanhamento dermatológico
           </p>
         </div>
         <div className="flex gap-4 justify-center">
           <Button size="lg" onClick={() => navigate('/admin/login')}>
-            Acesso Administrativo
+            Acessar Plataforma
             <ArrowRight className="ml-2" size={18} />
           </Button>
         </div>
+        <p className="text-sm text-muted-foreground mt-4">
+          Acesso para equipe médica e pacientes
+        </p>
       </div>
     </div>
   );
