@@ -1,22 +1,66 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 import logoAguera from '@/assets/logo-aguera.jpeg';
+import { PatientProfile } from '@/components/patient/PatientProfile';
+import { PatientExamsList } from '@/components/patient/PatientExamsList';
+import { PatientRecommendationsList } from '@/components/patient/PatientRecommendationsList';
+import { ClinicNewsTimeline } from '@/components/patient/ClinicNewsTimeline';
 
 const PatientPortal = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+
+  const { data: patient, isLoading, refetch } = useQuery({
+    queryKey: ['patient-profile', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      
+      const { data, error } = await supabase
+        .from('patients')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/paciente/login');
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!patient) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <p className="text-muted-foreground">Perfil de paciente não encontrado</p>
+          <Button onClick={handleSignOut}>Sair</Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
+      <header className="border-b bg-card sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <img 
@@ -36,59 +80,24 @@ const PatientPortal = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 space-y-8">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-2">
-            Bem-vindo(a), {user?.email}
+          <h2 className="text-3xl font-bold text-foreground mb-2">
+            Bem-vinda, {patient.full_name}!
           </h2>
           <p className="text-muted-foreground">
             Acesse seus exames, recomendações e novidades da clínica
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Meus Exames</CardTitle>
-              <CardDescription>
-                Visualize seus exames e resultados
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Em breve você poderá acessar seus exames aqui
-              </p>
-            </CardContent>
-          </Card>
+        <PatientProfile patient={patient} onPhotoUpdate={refetch} />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Recomendações</CardTitle>
-              <CardDescription>
-                Vídeos e orientações personalizadas
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Em breve você poderá acessar suas recomendações aqui
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Novidades</CardTitle>
-              <CardDescription>
-                Últimas notícias da clínica
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Em breve você poderá acessar as novidades aqui
-              </p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <PatientExamsList patientId={patient.id} />
+          <PatientRecommendationsList patientId={patient.id} />
         </div>
+
+        <ClinicNewsTimeline />
       </main>
     </div>
   );
