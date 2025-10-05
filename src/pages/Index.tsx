@@ -23,7 +23,7 @@ const Index = () => {
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" variant="secondary" onClick={() => navigate('/paciente/ativar')}>
+          <Button size="lg" variant="secondary" onClick={() => navigate('/paciente/login')}>
             <UserCircle className="mr-2" size={20} />
             Acesso do Paciente
           </Button>

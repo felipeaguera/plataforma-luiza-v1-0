@@ -11,6 +11,8 @@ import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import PatientsPage from "./pages/admin/Patients";
 import PatientDetail from "./pages/admin/PatientDetail";
+import PatientLogin from "./pages/patient/Login";
+import PatientPortal from "./pages/patient/Portal";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +26,15 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/paciente/login" element={<PatientLogin />} />
+            <Route 
+              path="/paciente/portal" 
+              element={
+                <ProtectedRoute>
+                  <PatientPortal />
+                </ProtectedRoute>
+              } 
+            />
             <Route 
               path="/admin/dashboard" 
               element={
