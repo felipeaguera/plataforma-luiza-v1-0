@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Edit, FileText, Link2, Download, ExternalLink, Video } from 'lucide-react';
+import { Plus, Trash2, Edit, FileText, Link2, Download, ExternalLink, Video, Play } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { RecommendationDialog } from './RecommendationDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface PatientRecommendationsProps {
   patientId: string;
@@ -18,6 +19,7 @@ export function PatientRecommendations({ patientId }: PatientRecommendationsProp
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingRecommendation, setEditingRecommendation] = useState<any>(null);
   const [recommendationToDelete, setRecommendationToDelete] = useState<string | null>(null);
+  const [viewingVideo, setViewingVideo] = useState<any>(null);
   const queryClient = useQueryClient();
 
   const { data: recommendations = [], isLoading } = useQuery({
@@ -75,50 +77,17 @@ export function PatientRecommendations({ patientId }: PatientRecommendationsProp
 
   const renderRecommendationContent = (recommendation: any) => {
     if (recommendation.media_type === 'video' && recommendation.media_url) {
-      // Check if it's a YouTube/Vimeo URL
-      const isYouTube = recommendation.media_url.includes('youtube.com') || recommendation.media_url.includes('youtu.be');
-      const isVimeo = recommendation.media_url.includes('vimeo.com');
-      
-      if (isYouTube) {
-        let videoId = '';
-        if (recommendation.media_url.includes('youtube.com')) {
-          videoId = recommendation.media_url.split('v=')[1]?.split('&')[0];
-        } else if (recommendation.media_url.includes('youtu.be')) {
-          videoId = recommendation.media_url.split('youtu.be/')[1]?.split('?')[0];
-        }
-
-        if (videoId) {
-          return (
-            <div className="mt-2">
-              <div className="aspect-video w-full">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  src={`https://www.youtube.com/embed/${videoId}`}
-                  title={recommendation.title}
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="rounded-md"
-                />
-              </div>
-            </div>
-          );
-        }
-      }
-      
-      // For uploaded video files or other video URLs
       return (
         <div className="mt-2">
-          <div className="aspect-video w-full bg-black rounded-md">
-            <video
-              controls
-              className="w-full h-full rounded-md"
-              src={recommendation.media_url}
-            >
-              Seu navegador não suporta a tag de vídeo.
-            </video>
-          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setViewingVideo(recommendation)}
+            className="gap-2"
+          >
+            <Play size={16} />
+            Visualizar vídeo
+          </Button>
         </div>
       );
     }
@@ -248,6 +217,56 @@ export function PatientRecommendations({ patientId }: PatientRecommendationsProp
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!viewingVideo} onOpenChange={() => setViewingVideo(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>{viewingVideo?.title}</DialogTitle>
+          </DialogHeader>
+          {viewingVideo && (() => {
+            const isYouTube = viewingVideo.media_url.includes('youtube.com') || viewingVideo.media_url.includes('youtu.be');
+            
+            if (isYouTube) {
+              let videoId = '';
+              if (viewingVideo.media_url.includes('youtube.com')) {
+                videoId = viewingVideo.media_url.split('v=')[1]?.split('&')[0];
+              } else if (viewingVideo.media_url.includes('youtu.be')) {
+                videoId = viewingVideo.media_url.split('youtu.be/')[1]?.split('?')[0];
+              }
+
+              if (videoId) {
+                return (
+                  <div className="aspect-video w-full">
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      src={`https://www.youtube.com/embed/${videoId}`}
+                      title={viewingVideo.title}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="rounded-md"
+                    />
+                  </div>
+                );
+              }
+            }
+            
+            return (
+              <div className="aspect-video w-full bg-black rounded-md">
+                <video
+                  controls
+                  autoPlay
+                  className="w-full h-full rounded-md"
+                  src={viewingVideo.media_url}
+                >
+                  Seu navegador não suporta a tag de vídeo.
+                </video>
+              </div>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
