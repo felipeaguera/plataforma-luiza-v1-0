@@ -13,13 +13,16 @@ serve(async (req) => {
   }
 
   try {
-    const { patientId, password } = await req.json();
+    const { token, password } = await req.json();
 
-    if (!patientId || !password) {
-      throw new Error("Patient ID and password are required");
+    if (!token || !password) {
+      throw new Error("Token and password are required");
     }
 
-    // Create admin client with service role key
+    if (password.length < 6) {
+      throw new Error("Password must be at least 6 characters");
+    }
+
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -31,19 +34,42 @@ serve(async (req) => {
       }
     );
 
-    // Get patient data
-    const { data: patient, error: patientError } = await supabaseAdmin
-      .from("patients")
-      .select("*")
-      .eq("id", patientId)
+    // Get token data
+    const { data: tokenData, error: tokenError } = await supabaseAdmin
+      .from("patient_activation_tokens")
+      .select(`
+        *,
+        patients:patient_id (
+          id,
+          email,
+          full_name,
+          user_id
+        )
+      `)
+      .eq("token", token)
+      .eq("used", false)
       .single();
 
-    if (patientError || !patient) {
+    if (tokenError || !tokenData) {
+      throw new Error("Invalid or expired token");
+    }
+
+    const patient = Array.isArray(tokenData.patients) 
+      ? tokenData.patients[0] 
+      : tokenData.patients;
+
+    if (!patient) {
       throw new Error("Patient not found");
     }
 
     if (patient.user_id) {
-      throw new Error("Patient already activated");
+      throw new Error("Account already activated");
+    }
+
+    // Check token expiration
+    const expiresAt = new Date(tokenData.expires_at);
+    if (expiresAt < new Date()) {
+      throw new Error("Token has expired");
     }
 
     // Create auth user
@@ -52,6 +78,9 @@ serve(async (req) => {
         email: patient.email,
         password: password,
         email_confirm: true,
+        user_metadata: {
+          full_name: patient.full_name,
+        },
       });
 
     if (authError) {
@@ -65,7 +94,7 @@ serve(async (req) => {
         user_id: authData.user.id,
         activated_at: new Date().toISOString(),
       })
-      .eq("id", patientId);
+      .eq("id", patient.id);
 
     if (updateError) {
       // Rollback: delete the created user
@@ -73,11 +102,16 @@ serve(async (req) => {
       throw updateError;
     }
 
+    // Mark token as used
+    await supabaseAdmin
+      .from("patient_activation_tokens")
+      .update({ used: true })
+      .eq("token", token);
+
     return new Response(
       JSON.stringify({
         success: true,
-        message: "Patient activated successfully",
-        email: patient.email,
+        message: "Account activated successfully",
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
