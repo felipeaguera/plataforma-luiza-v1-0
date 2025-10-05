@@ -41,13 +41,8 @@ export default function AdminLogin() {
       return;
     }
 
-    // Check if user is admin after successful login
     toast.success('Login realizado com sucesso!');
-    
-    // Wait for auth state to update
-    setTimeout(() => {
-      navigate('/admin/dashboard');
-    }, 100);
+    // O redirecionamento será feito pelo useEffect quando isAdmin for atualizado
   };
 
   return (
