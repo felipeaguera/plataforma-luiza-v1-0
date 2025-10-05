@@ -1,19 +1,26 @@
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, FileText, Bell, LogOut } from 'lucide-react';
+import { Users, Bell, LogOut } from 'lucide-react';
+import { PatientDialog } from '@/components/admin/PatientDialog';
+import logo from '@/assets/logo-aguera.jpeg';
 
 export default function AdminDashboard() {
   const { user, signOut } = useAuth();
+  const [isPatientDialogOpen, setIsPatientDialogOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Aguera Dermatologia</h1>
-            <p className="text-sm text-muted-foreground">Painel Administrativo</p>
+          <div className="flex items-center gap-4">
+            <img src={logo} alt="Aguera Dermatologia" className="h-12 w-12 rounded-lg object-cover" />
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Aguera Dermatologia</h1>
+              <p className="text-sm text-muted-foreground">Painel Administrativo</p>
+            </div>
           </div>
           <Button variant="destructive" onClick={signOut}>
             <LogOut className="mr-2" size={16} />
@@ -66,7 +73,7 @@ export default function AdminDashboard() {
         <div className="space-y-4 mb-8">
           <h3 className="text-xl font-semibold text-foreground">Gestão de Pacientes</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Button size="lg" className="justify-start">
+            <Button size="lg" className="justify-start" onClick={() => setIsPatientDialogOpen(true)}>
               <Users className="mr-2" size={18} />
               Cadastrar Nova Paciente
             </Button>
@@ -76,6 +83,12 @@ export default function AdminDashboard() {
             </Button>
           </div>
         </div>
+
+        {/* Patient Dialog */}
+        <PatientDialog 
+          open={isPatientDialogOpen} 
+          onOpenChange={setIsPatientDialogOpen}
+        />
 
         {/* Clinic News Section */}
         <div className="space-y-4">
