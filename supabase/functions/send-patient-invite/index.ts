@@ -69,8 +69,9 @@ serve(async (req) => {
       throw tokenError;
     }
 
-    // Get the activation URL using the origin from the request
-    const activationUrl = `${origin}/paciente/ativar?token=${token}`;
+    // Get the activation URL - using the Lovable project URL
+    const projectUrl = "https://098eb491-9a9c-4b08-ba6a-5b7f903326a2.lovableproject.com";
+    const activationUrl = `${projectUrl}/paciente/ativar?token=${token}`;
 
     console.log("Activation URL:", activationUrl); // Log para debug
 
