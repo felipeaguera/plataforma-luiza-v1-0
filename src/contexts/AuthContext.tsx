@@ -47,14 +47,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (!mounted) return;
+        
+        console.log('Auth state changed:', event, session?.user?.email);
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await checkAdminRole(session.user.id);
+          // Use setTimeout to avoid blocking the auth state change
+          setTimeout(() => {
+            checkAdminRole(session.user.id);
+          }, 0);
         } else {
           setIsAdmin(false);
         }
@@ -67,6 +72,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!mounted) return;
+        
+        console.log('Initial session:', session?.user?.email);
         
         setSession(session);
         setUser(session?.user ?? null);
