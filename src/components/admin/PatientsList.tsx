@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { usePatients } from '@/hooks/usePatients';
-import { Search, Eye, Trash2, Mail } from 'lucide-react';
+import { Search, Eye, Trash2, Mail, UserCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { ManualActivationDialog } from './ManualActivationDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,9 +25,11 @@ import {
 
 export function PatientsList() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { patients, deletePatient, isDeleting } = usePatients();
   const [searchTerm, setSearchTerm] = useState('');
   const [patientToDelete, setPatientToDelete] = useState<string | null>(null);
+  const [patientToActivate, setPatientToActivate] = useState<any>(null);
 
   const filteredPatients = patients.filter(patient =>
     patient.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -111,9 +115,19 @@ export function PatientsList() {
                             <Eye size={16} />
                           </Button>
                           {!patient.activated_at && (
-                            <Button size="sm" variant="outline" title="Reenviar convite">
-                              <Mail size={16} />
-                            </Button>
+                            <>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                title="Ativar manualmente (teste)"
+                                onClick={() => setPatientToActivate(patient)}
+                              >
+                                <UserCheck size={16} />
+                              </Button>
+                              <Button size="sm" variant="outline" title="Reenviar convite">
+                                <Mail size={16} />
+                              </Button>
+                            </>
                           )}
                           <Button 
                             size="sm" 
@@ -133,6 +147,18 @@ export function PatientsList() {
           )}
         </CardContent>
       </Card>
+
+      {patientToActivate && (
+        <ManualActivationDialog
+          open={!!patientToActivate}
+          onOpenChange={(open) => !open && setPatientToActivate(null)}
+          patient={patientToActivate}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ['patients'] });
+            setPatientToActivate(null);
+          }}
+        />
+      )}
 
       <AlertDialog open={!!patientToDelete} onOpenChange={() => setPatientToDelete(null)}>
         <AlertDialogContent>
