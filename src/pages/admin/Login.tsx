@@ -46,7 +46,11 @@ export default function AdminLogin() {
     }
 
     toast.success('Login realizado com sucesso!');
-    // Navigation will be handled by useEffect when isAdmin is updated
+    
+    // Wait a bit for auth state to update and then redirect
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
 
   return (
