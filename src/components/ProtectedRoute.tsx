@@ -25,7 +25,7 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
   }
 
   if (requireAdmin && !isAdmin) {
-    return <Navigate to="/paciente/dashboard" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

@@ -5,30 +5,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import logoAguera from '@/assets/logo-aguera.jpeg';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const { signIn, user, isAdmin, isLoading: authLoading } = useAuth();
+  const { signIn, user, isAdmin } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirect if already logged in as admin
+  // Redirect if already logged in
   useEffect(() => {
-    if (user && !authLoading) {
-      if (isAdmin) {
-        setIsLoading(false);
-        navigate('/admin/dashboard', { replace: true });
-      } else {
-        // Not an admin, show error and reset
-        setIsLoading(false);
-        toast.error('Acesso negado. Você não tem permissão de administrador.');
-      }
+    if (user && isAdmin) {
+      navigate('/admin/dashboard', { replace: true });
     }
-  }, [user, isAdmin, authLoading, navigate]);
+  }, [user, isAdmin, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,22 +41,13 @@ export default function AdminLogin() {
       return;
     }
 
-    // Don't navigate here - let the useEffect handle it after isAdmin is set
     toast.success('Login realizado com sucesso!');
+    // Navigation will be handled by useEffect when isAdmin is updated
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-background p-4">
       <div className="w-full max-w-md">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/')}
-          className="mb-4"
-        >
-          <ArrowLeft size={18} className="mr-2" />
-          Voltar
-        </Button>
-        
         <div className="bg-card border border-border rounded-2xl shadow-lg p-8 space-y-6">
           {/* Logo */}
           <div className="text-center space-y-2">

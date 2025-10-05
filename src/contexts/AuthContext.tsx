@@ -35,26 +35,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (mounted) {
           setIsAdmin(!!data);
         }
-        return !!data;
       } catch (error) {
         console.error('Error checking admin role:', error);
         if (mounted) {
           setIsAdmin(false);
         }
-        return false;
       }
     };
 
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (!mounted) return;
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await checkAdminRole(session.user.id);
+          checkAdminRole(session.user.id);
         } else {
           setIsAdmin(false);
         }

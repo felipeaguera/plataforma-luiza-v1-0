@@ -19,22 +19,15 @@ const Index = () => {
             Dra. Luiza Aguera
           </h1>
           <p className="text-xl text-muted-foreground">
-            Plataforma de atendimento e acompanhamento dermatológico
+            Sistema de gestão de pacientes e comunicação clínica
           </p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" onClick={() => navigate('/admin/login')} variant="default">
-            <ArrowRight className="mr-2" size={18} />
+        <div className="flex gap-4 justify-center">
+          <Button size="lg" onClick={() => navigate('/admin/login')}>
             Acesso Administrativo
-          </Button>
-          <Button size="lg" onClick={() => navigate('/paciente/login')} variant="outline">
-            <ArrowRight className="mr-2" size={18} />
-            Acesso Paciente
+            <ArrowRight className="ml-2" size={18} />
           </Button>
         </div>
-        <p className="text-sm text-muted-foreground mt-4">
-          Escolha o tipo de acesso apropriado
-        </p>
       </div>
     </div>
   );
