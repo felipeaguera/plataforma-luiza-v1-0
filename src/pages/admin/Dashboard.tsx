@@ -33,6 +33,11 @@ export default function AdminDashboard() {
 
   const pendingInvites = patients.filter(p => !p.activated_at).length;
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -45,7 +50,7 @@ export default function AdminDashboard() {
               <p className="text-sm text-muted-foreground">Painel Administrativo</p>
             </div>
           </div>
-          <Button variant="destructive" onClick={signOut}>
+          <Button variant="destructive" onClick={handleSignOut}>
             <LogOut className="mr-2" size={16} />
             Sair
           </Button>
