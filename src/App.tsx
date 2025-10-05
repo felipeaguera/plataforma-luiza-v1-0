@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
+import PatientsPage from "./pages/admin/Patients";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,14 @@ const App = () => (
               element={
                 <ProtectedRoute requireAdmin>
                   <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/pacientes" 
+              element={
+                <ProtectedRoute requireAdmin>
+                  <PatientsPage />
                 </ProtectedRoute>
               } 
             />

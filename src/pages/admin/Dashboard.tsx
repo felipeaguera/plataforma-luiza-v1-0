@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Bell, LogOut } from 'lucide-react';
 import { PatientDialog } from '@/components/admin/PatientDialog';
-import { PatientsList } from '@/components/admin/PatientsList';
 import { usePatients } from '@/hooks/usePatients';
 import logo from '@/assets/logo-aguera.jpeg';
 
@@ -22,10 +22,10 @@ const motivationalPhrases = [
 ];
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { patients } = usePatients();
   const [isPatientDialogOpen, setIsPatientDialogOpen] = useState(false);
-  const [showPatientsList, setShowPatientsList] = useState(false);
   
   const motivationalPhrase = useMemo(() => {
     return motivationalPhrases[Math.floor(Math.random() * motivationalPhrases.length)];
@@ -104,20 +104,13 @@ export default function AdminDashboard() {
               size="lg" 
               variant="outline" 
               className="justify-start"
-              onClick={() => setShowPatientsList(!showPatientsList)}
+              onClick={() => navigate('/admin/pacientes')}
             >
               <Users className="mr-2" size={18} />
-              {showPatientsList ? 'Ocultar Pacientes' : 'Ver Todas as Pacientes'}
+              Ver Todas as Pacientes
             </Button>
           </div>
         </div>
-
-        {/* Patients List */}
-        {showPatientsList && (
-          <div className="mb-8">
-            <PatientsList />
-          </div>
-        )}
 
         {/* Patient Dialog */}
         <PatientDialog 
