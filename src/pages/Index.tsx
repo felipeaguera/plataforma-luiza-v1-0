@@ -11,12 +11,12 @@ const Index = () => {
       <div className="text-center space-y-8 p-8 max-w-2xl">
         <img 
           src={logoAguera} 
-          alt="Aguera Dermatologia" 
+          alt="Dra. Luiza Aguera" 
           className="w-32 h-32 mx-auto rounded-full object-cover border-4 border-primary/20 shadow-lg"
         />
         <div className="space-y-4">
           <h1 className="text-5xl font-bold text-foreground">
-            Aguera Dermatologia
+            Dra. Luiza Aguera
           </h1>
           <p className="text-xl text-muted-foreground">
             Sistema de gestão de pacientes e comunicação clínica
