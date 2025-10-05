@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import logoAguera from '@/assets/logo-aguera.jpeg';
 
 export default function AdminLogin() {
@@ -47,7 +47,7 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-background p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md space-y-6">
         <div className="bg-card border border-border rounded-2xl shadow-lg p-8 space-y-6">
           {/* Logo */}
           <div className="text-center space-y-2">
@@ -112,6 +112,13 @@ export default function AdminLogin() {
           <p className="text-xs text-center text-muted-foreground">
             Acesso restrito a administradores da clínica
           </p>
+        </div>
+
+        <div className="text-center">
+          <Button variant="ghost" onClick={() => navigate('/')}>
+            <ArrowLeft className="mr-2" size={16} />
+            Voltar para página inicial
+          </Button>
         </div>
       </div>
     </div>
