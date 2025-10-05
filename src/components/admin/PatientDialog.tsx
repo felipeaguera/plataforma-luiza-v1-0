@@ -53,6 +53,13 @@ export function PatientDialog({ open, onOpenChange, patientId }: PatientDialogPr
     },
   });
 
+  const handleClose = (isOpen: boolean) => {
+    if (!isOpen) {
+      form.reset();
+    }
+    onOpenChange(isOpen);
+  };
+
   const onSubmit = async (data: PatientFormData) => {
     try {
       await createPatient({
@@ -72,7 +79,7 @@ export function PatientDialog({ open, onOpenChange, patientId }: PatientDialogPr
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Cadastrar Nova Paciente</DialogTitle>
@@ -143,7 +150,7 @@ export function PatientDialog({ open, onOpenChange, patientId }: PatientDialogPr
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => onOpenChange(false)}
+                onClick={() => handleClose(false)}
                 disabled={isCreating}
               >
                 Cancelar
