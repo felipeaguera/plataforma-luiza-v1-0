@@ -8,20 +8,20 @@ import { toast } from 'sonner';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import logoAguera from '@/assets/logo-aguera.jpeg';
 
-export default function AdminLogin() {
+export default function PatientLogin() {
   const navigate = useNavigate();
-  const { signIn, user, isAdmin, isLoading: authLoading } = useAuth();
+  const { signIn, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirect if already logged in as admin
+  // Redirect if already logged in
   useEffect(() => {
-    if (user && !authLoading && isAdmin) {
-      navigate('/admin/dashboard', { replace: true });
+    if (user) {
+      navigate('/paciente/dashboard', { replace: true });
     }
-  }, [user, isAdmin, authLoading, navigate]);
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,13 +41,7 @@ export default function AdminLogin() {
       return;
     }
 
-    // Check if user is admin after successful login
     toast.success('Login realizado com sucesso!');
-    
-    // Wait for auth state to update
-    setTimeout(() => {
-      navigate('/admin/dashboard');
-    }, 100);
   };
 
   return (
@@ -71,7 +65,7 @@ export default function AdminLogin() {
               className="w-24 h-24 mx-auto rounded-full object-cover border-4 border-primary/20"
             />
             <h1 className="text-2xl font-bold text-foreground">Aguera Dermatologia</h1>
-            <p className="text-sm text-muted-foreground">Painel Administrativo</p>
+            <p className="text-sm text-muted-foreground">Acesso de Paciente</p>
           </div>
 
           {/* Form */}
@@ -81,7 +75,7 @@ export default function AdminLogin() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@aguera.com.br"
+                placeholder="seu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
@@ -124,7 +118,7 @@ export default function AdminLogin() {
           </form>
 
           <p className="text-xs text-center text-muted-foreground">
-            Acesso restrito a administradores da clínica
+            Acesso exclusivo para pacientes cadastrados
           </p>
         </div>
       </div>

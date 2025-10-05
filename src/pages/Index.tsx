@@ -22,14 +22,18 @@ const Index = () => {
             Plataforma de atendimento e acompanhamento dermatológico
           </p>
         </div>
-        <div className="flex gap-4 justify-center">
-          <Button size="lg" onClick={() => navigate('/admin/login')}>
-            Acessar Plataforma
-            <ArrowRight className="ml-2" size={18} />
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button size="lg" onClick={() => navigate('/admin/login')} variant="default">
+            <ArrowRight className="mr-2" size={18} />
+            Acesso Administrativo
+          </Button>
+          <Button size="lg" onClick={() => navigate('/paciente/login')} variant="outline">
+            <ArrowRight className="mr-2" size={18} />
+            Acesso Paciente
           </Button>
         </div>
         <p className="text-sm text-muted-foreground mt-4">
-          Acesso para equipe médica e pacientes
+          Escolha o tipo de acesso apropriado
         </p>
       </div>
     </div>

@@ -12,6 +12,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import PatientsPage from "./pages/admin/Patients";
 import PatientDetail from "./pages/admin/PatientDetail";
 import PatientDashboard from "./pages/patient/Dashboard";
+import PatientLogin from "./pages/patient/Login";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/paciente/login" element={<PatientLogin />} />
             <Route 
               path="/paciente/dashboard" 
               element={
