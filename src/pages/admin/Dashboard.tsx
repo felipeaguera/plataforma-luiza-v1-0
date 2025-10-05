@@ -34,27 +34,14 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="text-primary" size={20} />
-                Pacientes
+                Pacientes Cadastradas
               </CardTitle>
-              <CardDescription>Total cadastradas</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-4xl font-bold">0</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="text-primary" size={20} />
-                Exames
-              </CardTitle>
-              <CardDescription>Publicados este mês</CardDescription>
+              <CardDescription>Total no sistema</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-4xl font-bold">0</p>
@@ -65,9 +52,9 @@ export default function AdminDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="text-primary" size={20} />
-                Convites
+                Convites Pendentes
               </CardTitle>
-              <CardDescription>Pendentes</CardDescription>
+              <CardDescription>Aguardando ativação</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-4xl font-bold">0</p>
@@ -75,19 +62,37 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-foreground">Ações Rápidas</h3>
+        {/* Patient Management Section */}
+        <div className="space-y-4 mb-8">
+          <h3 className="text-xl font-semibold text-foreground">Gestão de Pacientes</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Button size="lg" className="justify-start">
               <Users className="mr-2" size={18} />
               Cadastrar Nova Paciente
             </Button>
             <Button size="lg" variant="outline" className="justify-start">
-              <FileText className="mr-2" size={18} />
-              Ver Todas as Pacientes
+              <Users className="mr-2" size={18} />
+              Buscar Paciente
             </Button>
           </div>
+        </div>
+
+        {/* Clinic News Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold text-foreground">Novidades da Clínica</h3>
+            <Button variant="outline">
+              <Bell className="mr-2" size={18} />
+              Criar Novidade
+            </Button>
+          </div>
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-muted-foreground text-center py-8">
+                Nenhuma novidade publicada ainda. As novidades aparecerão na timeline de todas as pacientes.
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>
