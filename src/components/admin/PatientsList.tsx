@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { usePatients } from '@/hooks/usePatients';
-import { Search, Pencil, Trash2, Mail } from 'lucide-react';
+import { Search, Eye, Trash2, Mail } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 export function PatientsList() {
+  const navigate = useNavigate();
   const { patients, deletePatient, isDeleting } = usePatients();
   const [searchTerm, setSearchTerm] = useState('');
   const [patientToDelete, setPatientToDelete] = useState<string | null>(null);
@@ -100,14 +102,19 @@ export function PatientsList() {
                       <TableCell>{getStatusBadge(patient)}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            title="Ver detalhes"
+                            onClick={() => navigate(`/admin/pacientes/${patient.id}`)}
+                          >
+                            <Eye size={16} />
+                          </Button>
                           {!patient.activated_at && (
                             <Button size="sm" variant="outline" title="Reenviar convite">
                               <Mail size={16} />
                             </Button>
                           )}
-                          <Button size="sm" variant="outline" title="Editar">
-                            <Pencil size={16} />
-                          </Button>
                           <Button 
                             size="sm" 
                             variant="destructive" 
