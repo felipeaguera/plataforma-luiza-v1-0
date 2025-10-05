@@ -37,25 +37,18 @@ export function ManualActivationDialog({ open, onOpenChange, patient, onSuccess 
     setIsLoading(true);
 
     try {
-      // Create auth user with admin privileges
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: patient.email,
-        password: password,
-        email_confirm: true,
+      const { data, error } = await supabase.functions.invoke('activate-patient-manual', {
+        body: {
+          patientId: patient.id,
+          password: password,
+        },
       });
 
-      if (authError) throw authError;
-
-      // Update patient record with user_id and activated_at
-      const { error: updateError } = await supabase
-        .from('patients')
-        .update({ 
-          user_id: authData.user.id,
-          activated_at: new Date().toISOString(),
-        })
-        .eq('id', patient.id);
-
-      if (updateError) throw updateError;
+      if (error) throw error;
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
 
       toast({
         title: "Paciente ativado com sucesso!",
