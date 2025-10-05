@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Upload, Link2, FileText, Video } from 'lucide-react';
+import { Upload, Link2, FileText, Video, Camera } from 'lucide-react';
+import { VideoRecorder } from '@/components/admin/VideoRecorder';
 
 interface RecommendationDialogProps {
   open: boolean;
@@ -19,11 +20,12 @@ interface RecommendationDialogProps {
 
 export function RecommendationDialog({ open, onOpenChange, patientId, recommendation }: RecommendationDialogProps) {
   const [title, setTitle] = useState('');
-  const [contentType, setContentType] = useState<'text' | 'link' | 'file' | 'video'>('text');
+  const [contentType, setContentType] = useState<'text' | 'link' | 'file' | 'video' | 'record'>('text');
   const [content, setContent] = useState('');
   const [link, setLink] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
 
@@ -80,18 +82,18 @@ export function RecommendationDialog({ open, onOpenChange, patientId, recommenda
       return;
     }
 
-    if (contentType === 'video' && !videoFile && !recommendation) {
-      toast.error('Por favor, selecione um vídeo');
+    if ((contentType === 'video' || contentType === 'record') && !videoFile && !recommendation) {
+      toast.error('Por favor, selecione ou grave um vídeo');
       return;
     }
 
     setIsSubmitting(true);
     try {
       let mediaUrl = recommendation?.media_url || null;
-      let mediaType = contentType === 'text' ? null : contentType;
+      let mediaType = contentType === 'text' ? null : (contentType === 'record' ? 'video' : contentType);
 
-      // Upload video file if selected
-      if (contentType === 'video' && videoFile) {
+      // Upload video file if selected or recorded
+      if ((contentType === 'video' || contentType === 'record') && videoFile) {
         const fileExt = videoFile.name.split('.').pop();
         const fileName = `${Date.now()}.${fileExt}`;
         const filePath = `${patientId}/${fileName}`;
@@ -175,15 +177,29 @@ export function RecommendationDialog({ open, onOpenChange, patientId, recommenda
     }
   };
 
+  const handleVideoRecorded = (blob: Blob) => {
+    const file = new File([blob], `video-${Date.now()}.webm`, { type: 'video/webm' });
+    setVideoFile(file);
+    setIsRecording(false);
+    toast.success('Vídeo gravado com sucesso!');
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {recommendation ? 'Editar Recomendação' : 'Adicionar Recomendação'}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        
+        {isRecording ? (
+          <VideoRecorder
+            onVideoRecorded={handleVideoRecorded}
+            onCancel={() => setIsRecording(false)}
+          />
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="title">Título *</Label>
             <Input
@@ -218,6 +234,12 @@ export function RecommendationDialog({ open, onOpenChange, patientId, recommenda
                   <div className="flex items-center gap-2">
                     <Video size={16} />
                     Upload de Vídeo
+                  </div>
+                </SelectItem>
+                <SelectItem value="record">
+                  <div className="flex items-center gap-2">
+                    <Camera size={16} />
+                    Gravar Vídeo
                   </div>
                 </SelectItem>
                 <SelectItem value="file">
@@ -261,7 +283,7 @@ export function RecommendationDialog({ open, onOpenChange, patientId, recommenda
             </div>
           )}
 
-          {contentType === 'video' && (
+          {contentType === 'video' && !isRecording && (
             <div>
               <Label htmlFor="video">Arquivo de Vídeo *</Label>
               <div className="mt-2">
@@ -285,6 +307,44 @@ export function RecommendationDialog({ open, onOpenChange, patientId, recommenda
               <p className="text-xs text-muted-foreground mt-1">
                 Formatos aceitos: MP4, MOV, AVI, MKV
               </p>
+            </div>
+          )}
+
+          {contentType === 'record' && (
+            <div>
+              <Label>Gravar Vídeo pela Webcam *</Label>
+              <div className="mt-2">
+                {!isRecording && !videoFile && (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => setIsRecording(true)}
+                  >
+                    <Camera className="mr-2" size={16} />
+                    Abrir Câmera
+                  </Button>
+                )}
+                {videoFile && !isRecording && (
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      ✓ Vídeo gravado com sucesso
+                    </p>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => {
+                        setVideoFile(null);
+                        setIsRecording(true);
+                      }}
+                    >
+                      <Camera className="mr-2" size={16} />
+                      Gravar Novamente
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -326,6 +386,7 @@ export function RecommendationDialog({ open, onOpenChange, patientId, recommenda
             </Button>
           </div>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );
