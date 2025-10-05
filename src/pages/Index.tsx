@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, UserCircle } from 'lucide-react';
 import logoAguera from '@/assets/logo-aguera.jpeg';
 
 const Index = () => {
@@ -22,7 +22,11 @@ const Index = () => {
             Sistema de gestão de pacientes e comunicação clínica
           </p>
         </div>
-        <div className="flex gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button size="lg" variant="secondary" onClick={() => navigate('/paciente/ativar')}>
+            <UserCircle className="mr-2" size={20} />
+            Acesso do Paciente
+          </Button>
           <Button size="lg" onClick={() => navigate('/admin/login')}>
             Acesso Administrativo
             <ArrowRight className="ml-2" size={18} />
