@@ -18,6 +18,7 @@ interface PatientGeneralInfoProps {
     phone: string | null;
     birth_date: string;
     photo_url?: string | null;
+    additional_info?: string | null;
     created_at: string;
   };
 }
@@ -137,6 +138,12 @@ export function PatientGeneralInfo({ patient }: PatientGeneralInfoProps) {
                   {format(new Date(patient.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                 </p>
               </div>
+              {patient.additional_info && (
+                <div className="md:col-span-2">
+                  <label className="text-sm font-medium text-muted-foreground">Informações Adicionais</label>
+                  <p className="text-foreground mt-1 whitespace-pre-wrap">{patient.additional_info}</p>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>

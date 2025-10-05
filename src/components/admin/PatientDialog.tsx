@@ -5,6 +5,7 @@ import * as z from 'zod';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { usePatients } from '@/hooks/usePatients';
 import { toast } from 'sonner';
@@ -31,6 +32,11 @@ const patientSchema = z.object({
       const age = today.getFullYear() - birthDate.getFullYear();
       return age >= 1;
     }, 'Paciente deve ter pelo menos 1 ano'),
+  additional_info: z.string()
+    .trim()
+    .max(500, 'Informações adicionais devem ter no máximo 500 caracteres')
+    .optional()
+    .or(z.literal('')),
 });
 
 type PatientFormData = z.infer<typeof patientSchema>;
@@ -44,6 +50,7 @@ interface PatientDialogProps {
     email: string;
     phone: string | null;
     birth_date: string;
+    additional_info?: string | null;
   };
 }
 
@@ -57,6 +64,7 @@ export function PatientDialog({ open, onOpenChange, patient }: PatientDialogProp
       email: patient?.email || '',
       phone: patient?.phone || '',
       birth_date: patient?.birth_date || '',
+      additional_info: patient?.additional_info || '',
     },
   });
 
@@ -68,6 +76,7 @@ export function PatientDialog({ open, onOpenChange, patient }: PatientDialogProp
         email: patient.email,
         phone: patient.phone || '',
         birth_date: patient.birth_date,
+        additional_info: patient.additional_info || '',
       });
     }
   }, [patient, form]);
@@ -89,6 +98,7 @@ export function PatientDialog({ open, onOpenChange, patient }: PatientDialogProp
             email: data.email,
             birth_date: data.birth_date,
             phone: data.phone || null,
+            additional_info: data.additional_info || null,
           },
         });
         toast.success('Paciente atualizada com sucesso!');
@@ -98,6 +108,7 @@ export function PatientDialog({ open, onOpenChange, patient }: PatientDialogProp
           email: data.email,
           birth_date: data.birth_date,
           phone: data.phone || null,
+          additional_info: data.additional_info || null,
         });
         toast.success('Paciente cadastrada com sucesso!');
       }
@@ -180,6 +191,24 @@ export function PatientDialog({ open, onOpenChange, patient }: PatientDialogProp
                   <FormLabel>Data de Nascimento *</FormLabel>
                   <FormControl>
                     <Input type="date" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="additional_info"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Informações Adicionais</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Ex: Alergias, observações importantes..." 
+                      rows={3}
+                      {...field} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

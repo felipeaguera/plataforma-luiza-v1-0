@@ -6,6 +6,7 @@ interface PatientCreateData {
   email: string;
   phone?: string | null;
   birth_date: string;
+  additional_info?: string | null;
 }
 
 export function usePatients() {
