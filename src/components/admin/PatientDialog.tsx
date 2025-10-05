@@ -72,9 +72,15 @@ export function PatientDialog({ open, onOpenChange, patientId }: PatientDialogPr
       toast.success('Paciente cadastrada com sucesso!');
       form.reset();
       onOpenChange(false);
-    } catch (error) {
-      toast.error('Erro ao cadastrar paciente. Tente novamente.');
+    } catch (error: any) {
       console.error('Error creating patient:', error);
+      
+      // Check for duplicate email error
+      if (error?.code === '23505' || error?.message?.includes('duplicate key')) {
+        toast.error('Este email já está cadastrado no sistema!');
+      } else {
+        toast.error('Erro ao cadastrar paciente. Tente novamente.');
+      }
     }
   };
 
