@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Bell, LogOut } from 'lucide-react';
 import { PatientDialog } from '@/components/admin/PatientDialog';
+import { PatientsList } from '@/components/admin/PatientsList';
+import { usePatients } from '@/hooks/usePatients';
 import logo from '@/assets/logo-aguera.jpeg';
 
 const motivationalPhrases = [
@@ -21,11 +23,15 @@ const motivationalPhrases = [
 
 export default function AdminDashboard() {
   const { user, signOut } = useAuth();
+  const { patients } = usePatients();
   const [isPatientDialogOpen, setIsPatientDialogOpen] = useState(false);
+  const [showPatientsList, setShowPatientsList] = useState(false);
   
   const motivationalPhrase = useMemo(() => {
     return motivationalPhrases[Math.floor(Math.random() * motivationalPhrases.length)];
   }, []);
+
+  const pendingInvites = patients.filter(p => !p.activated_at).length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,7 +74,7 @@ export default function AdminDashboard() {
               <CardDescription>Total no sistema</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-bold">0</p>
+              <p className="text-4xl font-bold">{patients.length}</p>
             </CardContent>
           </Card>
 
@@ -81,7 +87,7 @@ export default function AdminDashboard() {
               <CardDescription>Aguardando ativação</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-bold">0</p>
+              <p className="text-4xl font-bold">{pendingInvites}</p>
             </CardContent>
           </Card>
         </div>
@@ -94,12 +100,24 @@ export default function AdminDashboard() {
               <Users className="mr-2" size={18} />
               Cadastrar Nova Paciente
             </Button>
-            <Button size="lg" variant="outline" className="justify-start">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="justify-start"
+              onClick={() => setShowPatientsList(!showPatientsList)}
+            >
               <Users className="mr-2" size={18} />
-              Buscar Paciente
+              {showPatientsList ? 'Ocultar Pacientes' : 'Ver Todas as Pacientes'}
             </Button>
           </div>
         </div>
+
+        {/* Patients List */}
+        {showPatientsList && (
+          <div className="mb-8">
+            <PatientsList />
+          </div>
+        )}
 
         {/* Patient Dialog */}
         <PatientDialog 
