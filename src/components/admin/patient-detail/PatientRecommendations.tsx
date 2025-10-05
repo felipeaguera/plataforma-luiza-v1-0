@@ -75,32 +75,52 @@ export function PatientRecommendations({ patientId }: PatientRecommendationsProp
 
   const renderRecommendationContent = (recommendation: any) => {
     if (recommendation.media_type === 'video' && recommendation.media_url) {
-      // Extract YouTube video ID
-      let videoId = '';
-      if (recommendation.media_url.includes('youtube.com')) {
-        videoId = recommendation.media_url.split('v=')[1]?.split('&')[0];
-      } else if (recommendation.media_url.includes('youtu.be')) {
-        videoId = recommendation.media_url.split('youtu.be/')[1]?.split('?')[0];
-      }
+      // Check if it's a YouTube/Vimeo URL
+      const isYouTube = recommendation.media_url.includes('youtube.com') || recommendation.media_url.includes('youtu.be');
+      const isVimeo = recommendation.media_url.includes('vimeo.com');
+      
+      if (isYouTube) {
+        let videoId = '';
+        if (recommendation.media_url.includes('youtube.com')) {
+          videoId = recommendation.media_url.split('v=')[1]?.split('&')[0];
+        } else if (recommendation.media_url.includes('youtu.be')) {
+          videoId = recommendation.media_url.split('youtu.be/')[1]?.split('?')[0];
+        }
 
-      if (videoId) {
-        return (
-          <div className="mt-2">
-            <div className="aspect-video w-full">
-              <iframe
-                width="100%"
-                height="100%"
-                src={`https://www.youtube.com/embed/${videoId}`}
-                title={recommendation.title}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="rounded-md"
-              />
+        if (videoId) {
+          return (
+            <div className="mt-2">
+              <div className="aspect-video w-full">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={`https://www.youtube.com/embed/${videoId}`}
+                  title={recommendation.title}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="rounded-md"
+                />
+              </div>
             </div>
-          </div>
-        );
+          );
+        }
       }
+      
+      // For uploaded video files or other video URLs
+      return (
+        <div className="mt-2">
+          <div className="aspect-video w-full bg-black rounded-md">
+            <video
+              controls
+              className="w-full h-full rounded-md"
+              src={recommendation.media_url}
+            >
+              Seu navegador não suporta a tag de vídeo.
+            </video>
+          </div>
+        </div>
+      );
     }
 
     if (recommendation.media_type === 'link' && recommendation.media_url) {

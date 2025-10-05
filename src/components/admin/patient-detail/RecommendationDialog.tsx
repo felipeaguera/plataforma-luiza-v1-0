@@ -23,6 +23,7 @@ export function RecommendationDialog({ open, onOpenChange, patientId, recommenda
   const [content, setContent] = useState('');
   const [link, setLink] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
 
@@ -30,9 +31,18 @@ export function RecommendationDialog({ open, onOpenChange, patientId, recommenda
     if (recommendation) {
       setTitle(recommendation.title);
       setContent(recommendation.content || '');
-      if (recommendation.media_type === 'link' || recommendation.media_type === 'video') {
+      if (recommendation.media_type === 'link') {
         setContentType('link');
         setLink(recommendation.media_url || '');
+      } else if (recommendation.media_type === 'video') {
+        // Check if it's a URL or uploaded file
+        if (recommendation.media_url?.startsWith('http') && 
+            (recommendation.media_url.includes('youtube') || recommendation.media_url.includes('vimeo'))) {
+          setContentType('link');
+          setLink(recommendation.media_url);
+        } else {
+          setContentType('video');
+        }
       } else if (recommendation.media_type === 'file') {
         setContentType('file');
       } else {
@@ -43,6 +53,7 @@ export function RecommendationDialog({ open, onOpenChange, patientId, recommenda
       setContent('');
       setLink('');
       setFile(null);
+      setVideoFile(null);
       setContentType('text');
     }
   }, [recommendation]);
@@ -69,13 +80,37 @@ export function RecommendationDialog({ open, onOpenChange, patientId, recommenda
       return;
     }
 
+    if (contentType === 'video' && !videoFile && !recommendation) {
+      toast.error('Por favor, selecione um vídeo');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       let mediaUrl = recommendation?.media_url || null;
       let mediaType = contentType === 'text' ? null : contentType;
 
+      // Upload video file if selected
+      if (contentType === 'video' && videoFile) {
+        const fileExt = videoFile.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const filePath = `${patientId}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('recommendations')
+          .upload(filePath, videoFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('recommendations')
+          .getPublicUrl(filePath);
+
+        mediaUrl = publicUrl;
+        mediaType = 'video';
+      }
       // Upload file if new file is selected
-      if (contentType === 'file' && file) {
+      else if (contentType === 'file' && file) {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}.${fileExt}`;
         const filePath = `${patientId}/${fileName}`;
@@ -176,7 +211,13 @@ export function RecommendationDialog({ open, onOpenChange, patientId, recommenda
                 <SelectItem value="link">
                   <div className="flex items-center gap-2">
                     <Link2 size={16} />
-                    Link / Vídeo
+                    Link / Vídeo URL
+                  </div>
+                </SelectItem>
+                <SelectItem value="video">
+                  <div className="flex items-center gap-2">
+                    <Video size={16} />
+                    Upload de Vídeo
                   </div>
                 </SelectItem>
                 <SelectItem value="file">
@@ -216,6 +257,33 @@ export function RecommendationDialog({ open, onOpenChange, patientId, recommenda
               />
               <p className="text-xs text-muted-foreground mt-1">
                 Links do YouTube, Vimeo ou qualquer URL
+              </p>
+            </div>
+          )}
+
+          {contentType === 'video' && (
+            <div>
+              <Label htmlFor="video">Arquivo de Vídeo *</Label>
+              <div className="mt-2">
+                <input
+                  type="file"
+                  accept="video/mp4,video/quicktime,video/x-msvideo,video/x-matroska"
+                  onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+                  className="hidden"
+                  id="video-upload-recommendation"
+                  required={!recommendation}
+                />
+                <label htmlFor="video-upload-recommendation">
+                  <Button type="button" variant="outline" className="w-full" asChild>
+                    <span className="cursor-pointer flex items-center justify-center">
+                      <Upload className="mr-2" size={16} />
+                      {videoFile ? videoFile.name : recommendation?.media_url ? 'Alterar vídeo' : 'Selecionar vídeo (MP4, MOV, AVI)'}
+                    </span>
+                  </Button>
+                </label>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Formatos aceitos: MP4, MOV, AVI, MKV
               </p>
             </div>
           )}
