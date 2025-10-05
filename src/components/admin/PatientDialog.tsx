@@ -9,7 +9,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { usePatients } from '@/hooks/usePatients';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 
 const patientSchema = z.object({
   full_name: z.string()
@@ -104,38 +103,14 @@ export function PatientDialog({ open, onOpenChange, patient }: PatientDialogProp
         });
         toast.success('Paciente atualizada com sucesso!');
       } else {
-        const newPatient = await createPatient({
+        await createPatient({
           full_name: data.full_name,
           email: data.email,
           birth_date: data.birth_date,
           phone: data.phone || null,
           additional_info: data.additional_info || null,
         });
-        
-        // Send invitation email
-        if (newPatient) {
-          try {
-            const { error: emailError } = await supabase.functions.invoke('send-patient-invite', {
-              body: {
-                patientId: newPatient.id,
-                email: data.email,
-                fullName: data.full_name,
-              },
-            });
-
-            if (emailError) {
-              console.error('Error sending invitation email:', emailError);
-              toast.warning('Paciente cadastrado, mas houve erro ao enviar o convite por email.');
-            } else {
-              toast.success('Paciente cadastrado e convite enviado por email!');
-            }
-          } catch (error) {
-            console.error('Error invoking send-patient-invite:', error);
-            toast.warning('Paciente cadastrado, mas houve erro ao enviar o convite.');
-          }
-        } else {
-          toast.success('Paciente cadastrado com sucesso!');
-        }
+        toast.success('Paciente cadastrada com sucesso!');
       }
       
       form.reset();
