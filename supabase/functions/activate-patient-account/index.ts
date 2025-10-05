@@ -73,6 +73,9 @@ serve(async (req) => {
     }
 
     // Create auth user
+    let authUserId: string;
+    
+    // Try to create user, or get existing user if email already exists
     const { data: authData, error: authError } =
       await supabaseAdmin.auth.admin.createUser({
         email: patient.email,
@@ -84,21 +87,45 @@ serve(async (req) => {
       });
 
     if (authError) {
-      throw authError;
+      // If user already exists, try to get it
+      if (authError.message.includes("already been registered")) {
+        const { data: existingUsers, error: listError } = 
+          await supabaseAdmin.auth.admin.listUsers();
+        
+        if (listError) throw listError;
+        
+        const existingUser = existingUsers.users.find(u => u.email === patient.email);
+        
+        if (!existingUser) {
+          throw new Error("User exists but could not be found");
+        }
+        
+        authUserId = existingUser.id;
+        
+        // Update the user's password
+        const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+          authUserId,
+          { password: password }
+        );
+        
+        if (updateError) throw updateError;
+      } else {
+        throw authError;
+      }
+    } else {
+      authUserId = authData.user.id;
     }
 
     // Update patient record
     const { error: updateError } = await supabaseAdmin
       .from("patients")
       .update({
-        user_id: authData.user.id,
+        user_id: authUserId,
         activated_at: new Date().toISOString(),
       })
       .eq("id", patient.id);
 
     if (updateError) {
-      // Rollback: delete the created user
-      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
       throw updateError;
     }
 
