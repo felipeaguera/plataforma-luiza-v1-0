@@ -195,7 +195,7 @@ export type Database = {
       }
       recommendations: {
         Row: {
-          content: string
+          content: string | null
           created_at: string | null
           created_by: string | null
           id: string
@@ -206,7 +206,7 @@ export type Database = {
           title: string
         }
         Insert: {
-          content: string
+          content?: string | null
           created_at?: string | null
           created_by?: string | null
           id?: string
@@ -217,7 +217,7 @@ export type Database = {
           title: string
         }
         Update: {
-          content?: string
+          content?: string | null
           created_at?: string | null
           created_by?: string | null
           id?: string
