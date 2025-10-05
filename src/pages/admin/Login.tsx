@@ -18,8 +18,12 @@ export default function AdminLogin() {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (user && isAdmin) {
-      navigate('/admin/dashboard', { replace: true });
+    if (user) {
+      if (isAdmin) {
+        navigate('/admin/dashboard', { replace: true });
+      } else {
+        navigate('/paciente/dashboard', { replace: true });
+      }
     }
   }, [user, isAdmin, navigate]);
 
@@ -57,7 +61,7 @@ export default function AdminLogin() {
               className="w-24 h-24 mx-auto rounded-full object-cover border-4 border-primary/20"
             />
             <h1 className="text-2xl font-bold text-foreground">Aguera Dermatologia</h1>
-            <p className="text-sm text-muted-foreground">Painel Administrativo</p>
+            <p className="text-sm text-muted-foreground">Área de Acesso</p>
           </div>
 
           {/* Form */}
@@ -110,7 +114,7 @@ export default function AdminLogin() {
           </form>
 
           <p className="text-xs text-center text-muted-foreground">
-            Acesso restrito a administradores da clínica
+            Login para administradores e pacientes
           </p>
         </div>
       </div>
