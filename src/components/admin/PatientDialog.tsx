@@ -1,3 +1,4 @@
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -37,21 +38,39 @@ type PatientFormData = z.infer<typeof patientSchema>;
 interface PatientDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  patientId?: string;
+  patient?: {
+    id: string;
+    full_name: string;
+    email: string;
+    phone: string | null;
+    birth_date: string;
+  };
 }
 
-export function PatientDialog({ open, onOpenChange, patientId }: PatientDialogProps) {
-  const { createPatient, isCreating } = usePatients();
+export function PatientDialog({ open, onOpenChange, patient }: PatientDialogProps) {
+  const { createPatient, isCreating, updatePatient, isUpdating } = usePatients();
   
   const form = useForm<PatientFormData>({
     resolver: zodResolver(patientSchema),
     defaultValues: {
-      full_name: '',
-      email: '',
-      phone: '',
-      birth_date: '',
+      full_name: patient?.full_name || '',
+      email: patient?.email || '',
+      phone: patient?.phone || '',
+      birth_date: patient?.birth_date || '',
     },
   });
+
+  // Update form when patient changes
+  React.useEffect(() => {
+    if (patient) {
+      form.reset({
+        full_name: patient.full_name,
+        email: patient.email,
+        phone: patient.phone || '',
+        birth_date: patient.birth_date,
+      });
+    }
+  }, [patient, form]);
 
   const handleClose = (isOpen: boolean) => {
     if (!isOpen) {
@@ -62,24 +81,37 @@ export function PatientDialog({ open, onOpenChange, patientId }: PatientDialogPr
 
   const onSubmit = async (data: PatientFormData) => {
     try {
-      await createPatient({
-        full_name: data.full_name,
-        email: data.email,
-        birth_date: data.birth_date,
-        phone: data.phone || null,
-      });
+      if (patient) {
+        await updatePatient({
+          id: patient.id,
+          data: {
+            full_name: data.full_name,
+            email: data.email,
+            birth_date: data.birth_date,
+            phone: data.phone || null,
+          },
+        });
+        toast.success('Paciente atualizada com sucesso!');
+      } else {
+        await createPatient({
+          full_name: data.full_name,
+          email: data.email,
+          birth_date: data.birth_date,
+          phone: data.phone || null,
+        });
+        toast.success('Paciente cadastrada com sucesso!');
+      }
       
-      toast.success('Paciente cadastrada com sucesso!');
       form.reset();
       onOpenChange(false);
     } catch (error: any) {
-      console.error('Error creating patient:', error);
+      console.error('Error saving patient:', error);
       
       // Check for duplicate email error
       if (error?.code === '23505' || error?.message?.includes('duplicate key')) {
         toast.error('Este email já está cadastrado no sistema!');
       } else {
-        toast.error('Erro ao cadastrar paciente. Tente novamente.');
+        toast.error(patient ? 'Erro ao atualizar paciente. Tente novamente.' : 'Erro ao cadastrar paciente. Tente novamente.');
       }
     }
   };
@@ -88,9 +120,11 @@ export function PatientDialog({ open, onOpenChange, patientId }: PatientDialogPr
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Cadastrar Nova Paciente</DialogTitle>
+          <DialogTitle>{patient ? 'Editar Paciente' : 'Cadastrar Nova Paciente'}</DialogTitle>
           <DialogDescription>
-            Preencha os dados da paciente. Um convite será enviado automaticamente.
+            {patient 
+              ? 'Atualize os dados da paciente abaixo.' 
+              : 'Preencha os dados da paciente. Um convite será enviado automaticamente.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -157,12 +191,14 @@ export function PatientDialog({ open, onOpenChange, patientId }: PatientDialogPr
                 type="button" 
                 variant="outline" 
                 onClick={() => handleClose(false)}
-                disabled={isCreating}
+                disabled={isCreating || isUpdating}
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isCreating}>
-                {isCreating ? 'Cadastrando...' : 'Cadastrar Paciente'}
+              <Button type="submit" disabled={isCreating || isUpdating}>
+                {isCreating || isUpdating 
+                  ? (patient ? 'Salvando...' : 'Cadastrando...') 
+                  : (patient ? 'Salvar Alterações' : 'Cadastrar Paciente')}
               </Button>
             </div>
           </form>

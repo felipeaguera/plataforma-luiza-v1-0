@@ -155,6 +155,7 @@ export type Database = {
           id: string
           invite_sent_at: string | null
           phone: string | null
+          photo_url: string | null
           updated_at: string | null
           user_id: string | null
         }
@@ -167,6 +168,7 @@ export type Database = {
           id?: string
           invite_sent_at?: string | null
           phone?: string | null
+          photo_url?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -179,6 +181,7 @@ export type Database = {
           id?: string
           invite_sent_at?: string | null
           phone?: string | null
+          photo_url?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
