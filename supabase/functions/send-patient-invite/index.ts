@@ -77,7 +77,7 @@ serve(async (req) => {
 
     // Send email
     const { error: emailError } = await resend.emails.send({
-      from: "Dra. Luiza Aguera <onboarding@resend.dev>",
+      from: "Dra. Luiza Aguera <noreply@agueradermatologia.com.br>",
       to: [patient.email],
       subject: "Ative sua conta - Portal da Paciente",
       html: `
