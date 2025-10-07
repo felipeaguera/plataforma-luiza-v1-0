@@ -38,11 +38,17 @@ export function PatientGeneralInfo({ patient }: PatientGeneralInfoProps) {
       const fileName = `${patient.id}-${Date.now()}.${fileExt}`;
       const filePath = `${patient.id}/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from('patient-photos')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error details:', uploadError);
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('patient-photos')
@@ -57,9 +63,10 @@ export function PatientGeneralInfo({ patient }: PatientGeneralInfoProps) {
 
       toast.success('Foto atualizada com sucesso!');
       queryClient.invalidateQueries({ queryKey: ['patient', patient.id] });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading photo:', error);
-      toast.error('Erro ao fazer upload da foto');
+      const errorMessage = error?.message || 'Erro ao fazer upload da foto';
+      toast.error(errorMessage);
     } finally {
       setIsUploading(false);
     }

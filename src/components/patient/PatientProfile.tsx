@@ -53,11 +53,17 @@ export function PatientProfile({ patient, onPhotoUpdate }: PatientProfileProps) 
       const fileExt = file.name.split('.').pop();
       const filePath = `${patient.id}/${Date.now()}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from('patient-photos')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error details:', uploadError);
+        throw uploadError;
+      }
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
@@ -78,12 +84,13 @@ export function PatientProfile({ patient, onPhotoUpdate }: PatientProfileProps) 
       });
 
       onPhotoUpdate();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading photo:', error);
+      const errorMessage = error?.message || 'Ocorreu um erro ao fazer upload da foto';
       toast({
         variant: "destructive",
         title: "Erro ao atualizar foto",
-        description: "Ocorreu um erro ao fazer upload da foto",
+        description: errorMessage,
       });
     } finally {
       setIsUploading(false);
