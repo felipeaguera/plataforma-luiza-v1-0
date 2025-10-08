@@ -21,7 +21,7 @@ serve(async (req) => {
     }
 
     // Get the origin URL from the request
-    const origin = req.headers.get("origin") || "https://098eb491-9a9c-4b08-ba6a-5b7f903326a2.lovableproject.com";
+    const origin = req.headers.get("origin") || "https://agueradermatologia.com.br";
 
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
     const supabaseAdmin = createClient(
@@ -69,8 +69,8 @@ serve(async (req) => {
       throw tokenError;
     }
 
-    // Get the activation URL - using the Lovable project URL
-    const projectUrl = "https://098eb491-9a9c-4b08-ba6a-5b7f903326a2.lovableproject.com";
+    // Get the activation URL - using the custom domain
+    const projectUrl = "https://agueradermatologia.com.br";
     const activationUrl = `${projectUrl}/paciente/ativar?token=${token}`;
 
     console.log("Activation URL:", activationUrl); // Log para debug
