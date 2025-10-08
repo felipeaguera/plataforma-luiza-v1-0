@@ -135,7 +135,7 @@ export function PatientDialog({ open, onOpenChange, patient }: PatientDialogProp
           <DialogDescription>
             {patient 
               ? 'Atualize os dados da paciente abaixo.' 
-              : 'Preencha os dados da paciente. Um convite será enviado automaticamente.'}
+              : 'Preencha os dados da paciente. O email de convite será enviado automaticamente.'}
           </DialogDescription>
         </DialogHeader>
 

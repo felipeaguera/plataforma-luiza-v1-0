@@ -29,14 +29,26 @@ export function usePatients() {
     mutationFn: async (patientData: PatientCreateData) => {
       const { data, error } = await supabase
         .from('patients')
-        .insert([{
-          ...patientData,
-          invite_sent_at: new Date().toISOString(),
-        }])
+        .insert([patientData])
         .select()
         .single();
       
       if (error) throw error;
+
+      // Enviar email de convite automaticamente
+      try {
+        const { error: inviteError } = await supabase.functions.invoke('send-patient-invite', {
+          body: { patientId: data.id }
+        });
+        
+        if (inviteError) {
+          console.error('Erro ao enviar convite:', inviteError);
+          // Não falha a criação do paciente se o email falhar
+        }
+      } catch (emailError) {
+        console.error('Erro ao enviar email de convite:', emailError);
+      }
+
       return data;
     },
     onSuccess: () => {
