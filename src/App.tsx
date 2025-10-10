@@ -11,6 +11,7 @@ import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import PatientsPage from "./pages/admin/Patients";
 import PatientDetail from "./pages/admin/PatientDetail";
+import ClinicNewsPage from "./pages/admin/ClinicNews";
 import PatientLogin from "./pages/patient/Login";
 import PatientPortal from "./pages/patient/Portal";
 import PatientActivate from "./pages/patient/Activate";
@@ -58,6 +59,14 @@ const App = () => (
               element={
                 <ProtectedRoute requireAdmin>
                   <PatientDetail />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/novidades" 
+              element={
+                <ProtectedRoute requireAdmin>
+                  <ClinicNewsPage />
                 </ProtectedRoute>
               } 
             />

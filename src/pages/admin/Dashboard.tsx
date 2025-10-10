@@ -127,15 +127,15 @@ export default function AdminDashboard() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-semibold text-foreground">Novidades da Clínica</h3>
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => navigate('/admin/novidades')}>
               <Bell className="mr-2" size={18} />
-              Criar Novidade
+              Gerenciar Novidades
             </Button>
           </div>
           <Card>
             <CardContent className="pt-6">
               <p className="text-muted-foreground text-center py-8">
-                Nenhuma novidade publicada ainda. As novidades aparecerão na timeline de todas as pacientes.
+                Compartilhe atualizações, novos tratamentos e informações importantes com todas as pacientes.
               </p>
             </CardContent>
           </Card>
