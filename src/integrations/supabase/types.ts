@@ -148,6 +148,50 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string
+          destino: string
+          error_message: string | null
+          id: string
+          meio: string
+          paciente_id: string | null
+          ref_id: string | null
+          status: string
+          tipo: string
+        }
+        Insert: {
+          created_at?: string
+          destino: string
+          error_message?: string | null
+          id?: string
+          meio?: string
+          paciente_id?: string | null
+          ref_id?: string | null
+          status?: string
+          tipo: string
+        }
+        Update: {
+          created_at?: string
+          destino?: string
+          error_message?: string | null
+          id?: string
+          meio?: string
+          paciente_id?: string | null
+          ref_id?: string | null
+          status?: string
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patient_activation_tokens: {
         Row: {
           created_at: string
@@ -193,6 +237,7 @@ export type Database = {
           full_name: string
           id: string
           invite_sent_at: string | null
+          opt_in_novidades: boolean
           phone: string | null
           photo_url: string | null
           updated_at: string | null
@@ -207,6 +252,7 @@ export type Database = {
           full_name: string
           id?: string
           invite_sent_at?: string | null
+          opt_in_novidades?: boolean
           phone?: string | null
           photo_url?: string | null
           updated_at?: string | null
@@ -221,6 +267,7 @@ export type Database = {
           full_name?: string
           id?: string
           invite_sent_at?: string | null
+          opt_in_novidades?: boolean
           phone?: string | null
           photo_url?: string | null
           updated_at?: string | null
