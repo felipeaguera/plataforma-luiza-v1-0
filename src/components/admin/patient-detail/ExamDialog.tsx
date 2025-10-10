@@ -47,7 +47,7 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
 
       if (uploadError) throw uploadError;
 
-      const { error: insertError } = await supabase
+      const { data: examData, error: insertError } = await supabase
         .from('exams')
         .insert({
           patient_id: patientId,
@@ -58,11 +58,31 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
           file_size: file.size,
           exam_date: examDate ? format(examDate, 'yyyy-MM-dd') : null,
           published_at: new Date().toISOString(),
-        });
+        })
+        .select()
+        .single();
 
       if (insertError) throw insertError;
 
-      toast.success('Exame adicionado com sucesso!');
+      // Send notification
+      if (examData) {
+        const { error: notificationError } = await supabase.functions.invoke(
+          "send-notification",
+          {
+            body: {
+              tipo: "exame",
+              ref_id: examData.id,
+              paciente_id: patientId,
+            },
+          }
+        );
+
+        if (notificationError) {
+          console.error("Error sending notification:", notificationError);
+        }
+      }
+
+      toast.success('Exame adicionado e paciente notificada!');
       queryClient.invalidateQueries({ queryKey: ['exams', patientId] });
       onOpenChange(false);
       setTitle('');

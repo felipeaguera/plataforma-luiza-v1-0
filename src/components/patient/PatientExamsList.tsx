@@ -1,15 +1,18 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FileText, Download, Calendar } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useEffect } from 'react';
 
 interface PatientExamsListProps {
   patientId: string;
 }
 
 export function PatientExamsList({ patientId }: PatientExamsListProps) {
+  const queryClient = useQueryClient();
+
   const { data: exams, isLoading } = useQuery({
     queryKey: ['patient-exams', patientId],
     queryFn: async () => {
@@ -24,6 +27,29 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
       return data;
     },
   });
+
+  // Setup realtime subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('exams-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'exams',
+          filter: `patient_id=eq.${patientId}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['patient-exams', patientId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [patientId, queryClient]);
 
   const handleDownload = async (filePath: string, fileName: string) => {
     try {

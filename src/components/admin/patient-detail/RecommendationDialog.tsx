@@ -155,16 +155,37 @@ export function RecommendationDialog({ open, onOpenChange, patientId, recommenda
         if (error) throw error;
         toast.success('Recomendação atualizada com sucesso!');
       } else {
-        const { error } = await supabase
+        const { data: recData, error } = await supabase
           .from('recommendations')
           .insert({
             ...dataToSave,
             patient_id: patientId,
             published_at: new Date().toISOString(),
-          });
+          })
+          .select()
+          .single();
 
         if (error) throw error;
-        toast.success('Recomendação adicionada com sucesso!');
+
+        // Send notification for new recommendations
+        if (recData) {
+          const { error: notificationError } = await supabase.functions.invoke(
+            "send-notification",
+            {
+              body: {
+                tipo: "recomendacao",
+                ref_id: recData.id,
+                paciente_id: patientId,
+              },
+            }
+          );
+
+          if (notificationError) {
+            console.error("Error sending notification:", notificationError);
+          }
+        }
+
+        toast.success('Recomendação adicionada e paciente notificada!');
       }
 
       queryClient.invalidateQueries({ queryKey: ['recommendations', patientId] });

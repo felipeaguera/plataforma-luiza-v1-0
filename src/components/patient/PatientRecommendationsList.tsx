@@ -1,13 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Video, FileText } from 'lucide-react';
+import { useEffect } from 'react';
 
 interface PatientRecommendationsListProps {
   patientId: string;
 }
 
 export function PatientRecommendationsList({ patientId }: PatientRecommendationsListProps) {
+  const queryClient = useQueryClient();
+
   const { data: recommendations, isLoading } = useQuery({
     queryKey: ['patient-recommendations', patientId],
     queryFn: async () => {
@@ -22,6 +25,29 @@ export function PatientRecommendationsList({ patientId }: PatientRecommendations
       return data;
     },
   });
+
+  // Setup realtime subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('recommendations-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'recommendations',
+          filter: `patient_id=eq.${patientId}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['patient-recommendations', patientId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [patientId, queryClient]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {

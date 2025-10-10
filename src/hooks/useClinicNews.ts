@@ -99,6 +99,22 @@ export function useClinicNews() {
         .single();
       
       if (error) throw error;
+
+      // Send notification
+      const { error: notificationError } = await supabase.functions.invoke(
+        "send-notification",
+        {
+          body: {
+            tipo: "novidade",
+            ref_id: id,
+          },
+        }
+      );
+
+      if (notificationError) {
+        console.error("Error sending notification:", notificationError);
+      }
+
       return data;
     },
     onSuccess: () => {
@@ -106,7 +122,7 @@ export function useClinicNews() {
       queryClient.invalidateQueries({ queryKey: ['clinic-news'] });
       toast({
         title: 'Publicado!',
-        description: 'A novidade foi publicada e está visível para todas as pacientes.',
+        description: 'A novidade foi publicada e pacientes foram notificados.',
       });
     },
     onError: (error) => {

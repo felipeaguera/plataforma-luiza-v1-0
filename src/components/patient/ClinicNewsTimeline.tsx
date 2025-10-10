@@ -1,9 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bell } from 'lucide-react';
+import { useEffect } from 'react';
 
 export function ClinicNewsTimeline() {
+  const queryClient = useQueryClient();
+
   const { data: news, isLoading } = useQuery({
     queryKey: ['clinic-news'],
     queryFn: async () => {
@@ -18,6 +21,28 @@ export function ClinicNewsTimeline() {
       return data;
     },
   });
+
+  // Setup realtime subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('clinic-news-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'clinic_news',
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['clinic-news'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
