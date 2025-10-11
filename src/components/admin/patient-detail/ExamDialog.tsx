@@ -35,6 +35,13 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
       return;
     }
 
+    // Check file size (50MB limit)
+    const maxSize = 50 * 1024 * 1024; // 50MB in bytes
+    if (file.size > maxSize) {
+      toast.error('O arquivo é muito grande. Tamanho máximo: 50MB');
+      return;
+    }
+
     setIsUploading(true);
     try {
       const fileExt = file.name.split('.').pop();
@@ -89,9 +96,13 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
       setDescription('');
       setExamDate(undefined);
       setFile(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading exam:', error);
-      toast.error('Erro ao adicionar exame');
+      if (error?.statusCode === '413' || error?.message?.includes('exceeded')) {
+        toast.error('Arquivo muito grande. Tamanho máximo: 50MB');
+      } else {
+        toast.error('Erro ao adicionar exame');
+      }
     } finally {
       setIsUploading(false);
     }
@@ -155,7 +166,7 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
           </div>
 
           <div>
-            <Label htmlFor="file">Arquivo PDF *</Label>
+            <Label htmlFor="file">Arquivo PDF * (máx. 50MB)</Label>
             <div className="mt-2">
               <input
                 type="file"
@@ -169,7 +180,7 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
                 <Button type="button" variant="outline" className="w-full" asChild>
                   <span className="cursor-pointer flex items-center justify-center">
                     <Upload className="mr-2" size={16} />
-                    {file ? file.name : 'Selecionar arquivo PDF'}
+                    {file ? `${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB)` : 'Selecionar arquivo PDF'}
                   </span>
                 </Button>
               </label>
