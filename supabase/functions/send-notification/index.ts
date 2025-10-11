@@ -157,11 +157,13 @@ serve(async (req) => {
     // Send emails
     const emailPromises = recipients.map(async (recipient) => {
       try {
+        const personalizedContent = emailContent.replace(/{{nome}}/g, recipient.name);
+        
         await resend.emails.send({
           from: "Dra. Luiza Aguera <noreply@agueradermatologia.com.br>",
           to: [recipient.email],
           subject: emailSubject,
-          html: emailContent.replace(recipients[0]?.name || "", recipient.name),
+          html: personalizedContent,
         });
 
         // Log successful notification
