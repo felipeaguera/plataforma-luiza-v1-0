@@ -58,24 +58,19 @@ serve(async (req) => {
         }];
       }
 
-      emailSubject = "Novo exame disponível no seu portal";
+      emailSubject = "Seu novo exame está disponível";
       emailContent = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Novo exame disponível!</h2>
-          <p>Olá ${recipients[0]?.name},</p>
-          <p>Um novo exame está disponível no seu portal.</p>
-          <p><strong>${exam?.title}</strong></p>
-          <div style="text-align: center; margin: 30px 0;">
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <p style="color: #333; font-size: 16px; margin-bottom: 16px;">Olá ${recipients[0]?.name},</p>
+          <p style="color: #333; font-size: 16px; margin-bottom: 20px;">Seu novo exame está disponível no portal da clínica.</p>
+          <p style="text-align: center; margin: 30px 0;">
             <a href="${projectUrl}/paciente/portal" 
-               style="background-color: #4F46E5; color: white; padding: 12px 30px; 
-                      text-decoration: none; border-radius: 6px; display: inline-block;">
-              Acessar Meu Portal
+               style="background: #5a3dff; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 16px;">
+              Acessar meu portal
             </a>
-          </div>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-          <p style="color: #999; font-size: 12px;">
-            Dra. Luiza Aguera - Dermatologia<br>
-            Este é um email automático, por favor não responda.
+          </p>
+          <p style="font-size: 12px; color: #999; margin-top: 30px;">
+            Este e-mail é automático. Não responda.
           </p>
         </div>
       `;
@@ -94,24 +89,19 @@ serve(async (req) => {
         }];
       }
 
-      emailSubject = "Nova recomendação da médica disponível";
+      emailSubject = "Você tem uma nova recomendação da médica";
       emailContent = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Você recebeu uma nova recomendação!</h2>
-          <p>Olá ${recipients[0]?.name},</p>
-          <p>A Dra. Luiza Aguera enviou uma nova recomendação para você.</p>
-          <p><strong>${recommendation?.title}</strong></p>
-          <div style="text-align: center; margin: 30px 0;">
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <p style="color: #333; font-size: 16px; margin-bottom: 16px;">Olá ${recipients[0]?.name},</p>
+          <p style="color: #333; font-size: 16px; margin-bottom: 20px;">Sua médica adicionou uma nova recomendação no seu portal.</p>
+          <p style="text-align: center; margin: 30px 0;">
             <a href="${projectUrl}/paciente/portal" 
-               style="background-color: #4F46E5; color: white; padding: 12px 30px; 
-                      text-decoration: none; border-radius: 6px; display: inline-block;">
-              Acessar Minhas Recomendações
+               style="background: #5a3dff; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 16px;">
+              Ver recomendação
             </a>
-          </div>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-          <p style="color: #999; font-size: 12px;">
-            Dra. Luiza Aguera - Dermatologia<br>
-            Este é um email automático, por favor não responda.
+          </p>
+          <p style="font-size: 12px; color: #999; margin-top: 30px;">
+            Este e-mail é automático. Não responda.
           </p>
         </div>
       `;
@@ -139,24 +129,20 @@ serve(async (req) => {
         }));
       }
 
-      emailSubject = "Nova novidade da clínica disponível!";
+      emailSubject = "Nova novidade no portal da clínica";
       emailContent = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Nova publicação da clínica!</h2>
-          <p>Olá,</p>
-          <p>Confira a nova novidade publicada pela clínica:</p>
-          <p><strong>${news?.title}</strong></p>
-          <div style="text-align: center; margin: 30px 0;">
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <p style="color: #333; font-size: 16px; margin-bottom: 16px;">Olá,</p>
+          <p style="color: #333; font-size: 16px; margin-bottom: 8px;">Temos uma nova novidade da clínica para você:</p>
+          <p style="color: #333; font-size: 16px; margin-bottom: 20px;"><strong>${news?.title}</strong></p>
+          <p style="text-align: center; margin: 30px 0;">
             <a href="${projectUrl}/paciente/portal" 
-               style="background-color: #4F46E5; color: white; padding: 12px 30px; 
-                      text-decoration: none; border-radius: 6px; display: inline-block;">
-              Ver Novidades
+               style="background: #5a3dff; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 16px;">
+              Acessar o portal
             </a>
-          </div>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-          <p style="color: #999; font-size: 12px;">
-            Dra. Luiza Aguera - Dermatologia<br>
-            Este é um email automático, por favor não responda.
+          </p>
+          <p style="font-size: 12px; color: #999; margin-top: 30px;">
+            Caso não queira mais receber novidades, acesse suas preferências no portal.
           </p>
         </div>
       `;
