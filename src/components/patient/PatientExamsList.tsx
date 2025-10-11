@@ -2,9 +2,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Download, Calendar } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { FileText, Download, Calendar, Eye } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface PatientExamsListProps {
   patientId: string;
@@ -12,6 +13,7 @@ interface PatientExamsListProps {
 
 export function PatientExamsList({ patientId }: PatientExamsListProps) {
   const queryClient = useQueryClient();
+  const [viewingExam, setViewingExam] = useState<{ url: string; title: string } | null>(null);
 
   const { data: exams, isLoading } = useQuery({
     queryKey: ['patient-exams', patientId],
@@ -51,6 +53,26 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
     };
   }, [patientId, queryClient]);
 
+  const handleView = async (filePath: string, title: string) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('exams')
+        .download(filePath);
+
+      if (error) throw error;
+
+      const url = URL.createObjectURL(data);
+      setViewingExam({ url, title });
+    } catch (error) {
+      console.error('Error viewing exam:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao visualizar exame",
+        description: "Não foi possível visualizar o arquivo",
+      });
+    }
+  };
+
   const handleDownload = async (filePath: string, fileName: string) => {
     try {
       const { data, error } = await supabase.storage
@@ -75,6 +97,13 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
         description: "Não foi possível fazer o download do arquivo",
       });
     }
+  };
+
+  const handleCloseViewer = () => {
+    if (viewingExam?.url) {
+      URL.revokeObjectURL(viewingExam.url);
+    }
+    setViewingExam(null);
   };
 
   const formatDate = (dateString: string | null) => {
@@ -128,19 +157,46 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
                     <span>{formatDate(exam.exam_date)}</span>
                   </div>
                 </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleDownload(exam.file_path, exam.file_name)}
-                >
-                  <Download size={16} className="mr-2" />
-                  Baixar
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleView(exam.file_path, exam.title)}
+                  >
+                    <Eye size={16} className="mr-2" />
+                    Visualizar
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleDownload(exam.file_path, exam.file_name)}
+                  >
+                    <Download size={16} className="mr-2" />
+                    Baixar
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </CardContent>
+
+      <Dialog open={!!viewingExam} onOpenChange={handleCloseViewer}>
+        <DialogContent className="max-w-4xl h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>{viewingExam?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 h-full">
+            {viewingExam && (
+              <iframe
+                src={viewingExam.url}
+                className="w-full h-full rounded-lg"
+                title={viewingExam.title}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
