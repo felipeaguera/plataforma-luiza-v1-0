@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bell } from 'lucide-react';
 import { useEffect } from 'react';
+import { getVideoEmbedUrl, isDirectVideoUrl } from '@/lib/videoUtils';
 
 export function ClinicNewsTimeline() {
   const queryClient = useQueryClient();
@@ -114,13 +115,23 @@ export function ClinicNewsTimeline() {
                       
                       {item.media_url && item.media_type === 'video' && (
                         <div className="mt-3 aspect-video rounded-lg overflow-hidden bg-black">
-                          <video
-                            controls
-                            className="w-full h-full"
-                            src={item.media_url}
-                          >
-                            Seu navegador não suporta vídeos.
-                          </video>
+                          {isDirectVideoUrl(item.media_url) ? (
+                            <video
+                              controls
+                              className="w-full h-full"
+                              src={item.media_url}
+                            >
+                              Seu navegador não suporta vídeos.
+                            </video>
+                          ) : (
+                            <iframe
+                              src={getVideoEmbedUrl(item.media_url) || item.media_url}
+                              className="w-full h-full"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              title={item.title}
+                            />
+                          )}
                         </div>
                       )}
                     </div>

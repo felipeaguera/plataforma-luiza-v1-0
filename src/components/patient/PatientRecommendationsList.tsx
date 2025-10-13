@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Video, FileText } from 'lucide-react';
 import { useEffect } from 'react';
+import { getVideoEmbedUrl, isDirectVideoUrl } from '@/lib/videoUtils';
 
 interface PatientRecommendationsListProps {
   patientId: string;
@@ -103,13 +104,23 @@ export function PatientRecommendationsList({ patientId }: PatientRecommendations
 
                 {recommendation.media_url && recommendation.media_type === 'video' && (
                   <div className="aspect-video rounded-lg overflow-hidden bg-black">
-                    <video
-                      controls
-                      className="w-full h-full"
-                      src={recommendation.media_url}
-                    >
-                      Seu navegador não suporta vídeos.
-                    </video>
+                    {isDirectVideoUrl(recommendation.media_url) ? (
+                      <video
+                        controls
+                        className="w-full h-full"
+                        src={recommendation.media_url}
+                      >
+                        Seu navegador não suporta vídeos.
+                      </video>
+                    ) : (
+                      <iframe
+                        src={getVideoEmbedUrl(recommendation.media_url) || recommendation.media_url}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={recommendation.title}
+                      />
+                    )}
                   </div>
                 )}
 

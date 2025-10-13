@@ -109,11 +109,47 @@ export function ClinicNewsDialog({ open, onOpenChange, news }: ClinicNewsDialogP
       if (news) {
         await updateNews({ id: news.id, data: newsData });
       } else {
-        await createNews(newsData);
+        const { data: newsResult, error: createError } = await supabase
+          .from('clinic_news')
+          .insert({
+            ...newsData,
+            published_at: new Date().toISOString(),
+          })
+          .select()
+          .single();
+
+        if (createError) throw createError;
+
+        // Send notification to all patients who opted in
+        if (newsResult) {
+          const { error: notificationError } = await supabase.functions.invoke(
+            "send-notification",
+            {
+              body: {
+                tipo: "novidade",
+                ref_id: newsResult.id,
+              },
+            }
+          );
+
+          if (notificationError) {
+            console.error("Error sending notification:", notificationError);
+          }
+        }
+
+        toast({
+          title: 'Sucesso',
+          description: 'Novidade publicada e pacientes notificados!',
+        });
       }
       onOpenChange(false);
     } catch (error) {
       console.error('Error saving news:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível salvar a novidade.',
+        variant: 'destructive',
+      });
     }
   };
 
