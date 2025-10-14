@@ -64,9 +64,9 @@ serve(async (req) => {
           <p style="color: #333; font-size: 16px; margin-bottom: 16px;">Olá {{nome}},</p>
           <p style="color: #333; font-size: 16px; margin-bottom: 20px;">Seu novo exame está disponível no portal da clínica.</p>
           <p style="text-align: center; margin: 30px 0;">
-            <a href="${projectUrl}/paciente/portal" 
+            <a href="${projectUrl}" 
                style="background: #5a3dff; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 16px;">
-              Acessar meu portal
+              Acessar plataforma
             </a>
           </p>
           <p style="font-size: 12px; color: #999; margin-top: 30px;">
@@ -95,9 +95,9 @@ serve(async (req) => {
           <p style="color: #333; font-size: 16px; margin-bottom: 16px;">Olá {{nome}},</p>
           <p style="color: #333; font-size: 16px; margin-bottom: 20px;">Sua médica adicionou uma nova recomendação no seu portal.</p>
           <p style="text-align: center; margin: 30px 0;">
-            <a href="${projectUrl}/paciente/portal" 
+            <a href="${projectUrl}" 
                style="background: #5a3dff; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 16px;">
-              Ver recomendação
+              Acessar plataforma
             </a>
           </p>
           <p style="font-size: 12px; color: #999; margin-top: 30px;">
@@ -136,9 +136,9 @@ serve(async (req) => {
           <p style="color: #333; font-size: 16px; margin-bottom: 8px;">Temos uma nova novidade da clínica para você:</p>
           <p style="color: #333; font-size: 16px; margin-bottom: 20px;"><strong>${news?.title}</strong></p>
           <p style="text-align: center; margin: 30px 0;">
-            <a href="${projectUrl}/paciente/portal" 
+            <a href="${projectUrl}" 
                style="background: #5a3dff; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 16px;">
-              Acessar o portal
+              Acessar plataforma
             </a>
           </p>
           <p style="font-size: 12px; color: #999; margin-top: 30px;">

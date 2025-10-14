@@ -60,39 +60,39 @@ const PatientPortal = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      <header className="border-b bg-card sticky top-0 z-10 shadow-sm">
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <img 
               src={logoAguera} 
               alt="Dra. Luiza Aguera" 
-              className="w-12 h-12 rounded-full object-cover border-2 border-primary/20"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-primary/20 flex-shrink-0"
             />
-            <div>
-              <h1 className="text-xl font-bold text-foreground">Portal do Paciente</h1>
-              <p className="text-sm text-muted-foreground">Dra. Luiza Aguera</p>
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-xl font-bold text-foreground truncate">Portal do Paciente</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground">Dra. Luiza Aguera</p>
             </div>
           </div>
-          <Button variant="ghost" onClick={handleSignOut}>
-            <LogOut className="mr-2" size={16} />
-            Sair
+          <Button variant="ghost" size="sm" onClick={handleSignOut} className="flex-shrink-0">
+            <LogOut className="sm:mr-2" size={16} />
+            <span className="hidden sm:inline">Sair</span>
           </Button>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 space-y-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-foreground mb-2">
+      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-6 sm:space-y-8">
+        <div className="mb-4 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
             Bem-vinda, {patient.full_name}!
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Acesse seus exames, recomendações e novidades da clínica
           </p>
         </div>
 
         <PatientProfile patient={patient} onPhotoUpdate={refetch} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           <PatientExamsList patientId={patient.id} />
           <PatientRecommendationsList patientId={patient.id} />
         </div>

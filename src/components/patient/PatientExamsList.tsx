@@ -145,35 +145,39 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
             {exams.map((exam) => (
               <div
                 key={exam.id}
-                className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
+                className="p-3 sm:p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
               >
-                <div className="flex-1">
-                  <h4 className="font-semibold text-foreground">{exam.title}</h4>
-                  {exam.description && (
-                    <p className="text-sm text-muted-foreground mt-1">{exam.description}</p>
-                  )}
-                  <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-                    <Calendar size={14} />
-                    <span>{formatDate(exam.exam_date)}</span>
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="font-semibold text-foreground text-sm sm:text-base">{exam.title}</h4>
+                    {exam.description && (
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-1">{exam.description}</p>
+                    )}
+                    <div className="flex items-center gap-2 mt-2 text-xs sm:text-sm text-muted-foreground">
+                      <Calendar size={14} />
+                      <span>{formatDate(exam.exam_date)}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleView(exam.file_path, exam.title)}
-                  >
-                    <Eye size={16} className="mr-2" />
-                    Visualizar
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleDownload(exam.file_path, exam.file_name)}
-                  >
-                    <Download size={16} className="mr-2" />
-                    Baixar
-                  </Button>
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleView(exam.file_path, exam.title)}
+                      className="w-full sm:w-auto justify-center"
+                    >
+                      <Eye size={16} className="mr-2" />
+                      Visualizar
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDownload(exam.file_path, exam.file_name)}
+                      className="w-full sm:w-auto justify-center"
+                    >
+                      <Download size={16} className="mr-2" />
+                      Baixar
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -182,15 +186,15 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
       </CardContent>
 
       <Dialog open={!!viewingExam} onOpenChange={handleCloseViewer}>
-        <DialogContent className="max-w-4xl h-[90vh]">
+        <DialogContent className="w-[95vw] max-w-4xl h-[85vh] sm:h-[90vh] p-3 sm:p-6">
           <DialogHeader>
-            <DialogTitle>{viewingExam?.title}</DialogTitle>
+            <DialogTitle className="text-sm sm:text-base truncate pr-8">{viewingExam?.title}</DialogTitle>
           </DialogHeader>
-          <div className="flex-1 h-full">
+          <div className="flex-1 h-[calc(100%-3rem)]">
             {viewingExam && (
               <iframe
                 src={viewingExam.url}
-                className="w-full h-full rounded-lg"
+                className="w-full h-full rounded-lg border border-border"
                 title={viewingExam.title}
               />
             )}

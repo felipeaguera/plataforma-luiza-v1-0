@@ -113,17 +113,17 @@ export function PatientProfile({ patient, onPhotoUpdate }: PatientProfileProps) 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Meu Perfil</CardTitle>
+        <CardTitle className="text-base sm:text-lg">Meu Perfil</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex items-center gap-6">
-          <div className="relative">
-            <Avatar className="w-24 h-24">
+      <CardContent className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+          <div className="relative flex-shrink-0">
+            <Avatar className="w-20 h-20 sm:w-24 sm:h-24">
               <AvatarImage src={patient.photo_url} alt={patient.full_name} />
-              <AvatarFallback className="text-2xl">{getInitials(patient.full_name)}</AvatarFallback>
+              <AvatarFallback className="text-xl sm:text-2xl">{getInitials(patient.full_name)}</AvatarFallback>
             </Avatar>
-            <label htmlFor="photo-upload" className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-2 cursor-pointer hover:bg-primary/90 transition-colors">
-              <Camera size={16} />
+            <label htmlFor="photo-upload" className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1.5 sm:p-2 cursor-pointer hover:bg-primary/90 transition-colors">
+              <Camera size={14} className="sm:w-4 sm:h-4" />
               <input
                 id="photo-upload"
                 type="file"
@@ -134,29 +134,29 @@ export function PatientProfile({ patient, onPhotoUpdate }: PatientProfileProps) 
               />
             </label>
           </div>
-          <div className="flex-1">
-            <h3 className="text-2xl font-bold text-foreground">{patient.full_name}</h3>
-            <p className="text-sm text-muted-foreground">Data de Nascimento: {formatDate(patient.birth_date)}</p>
+          <div className="flex-1 text-center sm:text-left">
+            <h3 className="text-xl sm:text-2xl font-bold text-foreground">{patient.full_name}</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">Data de Nascimento: {formatDate(patient.birth_date)}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Email</p>
-            <p className="text-foreground">{patient.email}</p>
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground">Email</p>
+            <p className="text-sm sm:text-base text-foreground break-all">{patient.email}</p>
           </div>
           {patient.phone && (
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Telefone</p>
-              <p className="text-foreground">{patient.phone}</p>
+              <p className="text-xs sm:text-sm font-medium text-muted-foreground">Telefone</p>
+              <p className="text-sm sm:text-base text-foreground">{patient.phone}</p>
             </div>
           )}
         </div>
 
         {patient.additional_info && (
           <div>
-            <p className="text-sm font-medium text-muted-foreground mb-2">Informações Adicionais</p>
-            <p className="text-foreground text-sm">{patient.additional_info}</p>
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">Informações Adicionais</p>
+            <p className="text-foreground text-xs sm:text-sm">{patient.additional_info}</p>
           </div>
         )}
       </CardContent>

@@ -77,29 +77,29 @@ export function PatientRecommendationsList({ patientId }: PatientRecommendations
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
           <Video className="text-primary" size={20} />
           Minhas Recomendações
         </CardTitle>
       </CardHeader>
       <CardContent>
         {!recommendations || recommendations.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">
+          <p className="text-muted-foreground text-center py-8 text-sm sm:text-base">
             Nenhuma recomendação disponível no momento
           </p>
         ) : (
           <div className="space-y-6">
             {recommendations.map((recommendation) => (
-              <div key={recommendation.id} className="border border-border rounded-lg p-4 space-y-3">
+              <div key={recommendation.id} className="border border-border rounded-lg p-3 sm:p-4 space-y-3">
                 <div>
-                  <h4 className="font-semibold text-foreground text-lg">{recommendation.title}</h4>
-                  <p className="text-sm text-muted-foreground">
+                  <h4 className="font-semibold text-foreground text-base sm:text-lg">{recommendation.title}</h4>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     {formatDate(recommendation.published_at || recommendation.created_at)}
                   </p>
                 </div>
 
                 {recommendation.content && (
-                  <p className="text-foreground">{recommendation.content}</p>
+                  <p className="text-foreground text-sm sm:text-base">{recommendation.content}</p>
                 )}
 
                 {recommendation.media_url && recommendation.media_type === 'video' && (

@@ -74,14 +74,14 @@ export function ClinicNewsTimeline() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
           <Bell className="text-primary" size={20} />
           Novidades da Clínica
         </CardTitle>
       </CardHeader>
       <CardContent>
         {!news || news.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">
+          <p className="text-muted-foreground text-center py-8 text-sm sm:text-base">
             Nenhuma novidade publicada ainda
           </p>
         ) : (
@@ -89,19 +89,19 @@ export function ClinicNewsTimeline() {
             {news.map((item, index) => (
               <div key={item.id} className="relative">
                 {index !== news.length - 1 && (
-                  <div className="absolute left-3 top-8 bottom-0 w-px bg-border" />
+                  <div className="absolute left-2 sm:left-3 top-8 bottom-0 w-px bg-border" />
                 )}
-                <div className="flex gap-4">
-                  <div className="relative z-10 flex-shrink-0 w-6 h-6 bg-primary rounded-full border-4 border-background" />
+                <div className="flex gap-3 sm:gap-4">
+                  <div className="relative z-10 flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary rounded-full border-2 sm:border-4 border-background" />
                   <div className="flex-1 pb-6">
-                    <div className="bg-accent/50 rounded-lg p-4 space-y-2">
-                      <div className="flex items-start justify-between gap-4">
-                        <h4 className="font-semibold text-foreground">{item.title}</h4>
-                        <p className="text-xs text-muted-foreground whitespace-nowrap">
+                    <div className="bg-accent/50 rounded-lg p-3 sm:p-4 space-y-2">
+                      <div className="flex items-start justify-between gap-2 sm:gap-4">
+                        <h4 className="font-semibold text-foreground text-sm sm:text-base">{item.title}</h4>
+                        <p className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
                           {formatDate(item.published_at || item.created_at)}
                         </p>
                       </div>
-                      <p className="text-foreground">{item.content}</p>
+                      <p className="text-foreground text-sm sm:text-base">{item.content}</p>
                       
                       {item.media_url && item.media_type === 'image' && (
                         <div className="mt-3 rounded-lg overflow-hidden">
