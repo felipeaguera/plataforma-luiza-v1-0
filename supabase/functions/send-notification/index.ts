@@ -60,18 +60,27 @@ serve(async (req) => {
 
       emailSubject = "Seu novo exame está disponível";
       emailContent = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <p style="color: #333; font-size: 16px; margin-bottom: 16px;">Olá {{nome}},</p>
-          <p style="color: #333; font-size: 16px; margin-bottom: 20px;">Seu novo exame está disponível no portal da clínica.</p>
-          <p style="text-align: center; margin: 30px 0;">
-            <a href="${projectUrl}" 
-               style="background: #5a3dff; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 16px;">
-              Acessar plataforma
-            </a>
-          </p>
-          <p style="font-size: 12px; color: #999; margin-top: 30px;">
-            Este e-mail é automático. Não responda.
-          </p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="background: linear-gradient(135deg, #5a3dff 0%, #7c3aed 100%); padding: 30px 20px; text-align: center;">
+            <img src="https://agueradermatologia.com.br/logo.jpg" alt="Dra. Luiza Aguera" style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid white; object-fit: cover; margin-bottom: 16px;" />
+            <h2 style="color: white; margin: 0; font-size: 24px;">Dra. Luiza Aguera</h2>
+            <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 14px;">Dermatologia</p>
+          </div>
+          <div style="padding: 30px 20px;">
+            <p style="color: #333; font-size: 16px; margin-bottom: 16px;">Olá {{nome}},</p>
+            <p style="color: #333; font-size: 16px; margin-bottom: 24px; line-height: 1.6;">Seu novo exame está disponível no portal da clínica.</p>
+            <p style="text-align: center; margin: 30px 0;">
+              <a href="${projectUrl}" 
+                 style="background: #5a3dff; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 16px; font-weight: 600;">
+                Acessar Plataforma
+              </a>
+            </p>
+          </div>
+          <div style="background: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e9ecef;">
+            <p style="font-size: 12px; color: #6c757d; margin: 0;">
+              Este e-mail é automático. Por favor, não responda.
+            </p>
+          </div>
         </div>
       `;
     } else if (tipo === "recomendacao") {
@@ -91,18 +100,27 @@ serve(async (req) => {
 
       emailSubject = "Você tem uma nova recomendação da médica";
       emailContent = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <p style="color: #333; font-size: 16px; margin-bottom: 16px;">Olá {{nome}},</p>
-          <p style="color: #333; font-size: 16px; margin-bottom: 20px;">Sua médica adicionou uma nova recomendação no seu portal.</p>
-          <p style="text-align: center; margin: 30px 0;">
-            <a href="${projectUrl}" 
-               style="background: #5a3dff; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 16px;">
-              Acessar plataforma
-            </a>
-          </p>
-          <p style="font-size: 12px; color: #999; margin-top: 30px;">
-            Este e-mail é automático. Não responda.
-          </p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="background: linear-gradient(135deg, #5a3dff 0%, #7c3aed 100%); padding: 30px 20px; text-align: center;">
+            <img src="https://agueradermatologia.com.br/logo.jpg" alt="Dra. Luiza Aguera" style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid white; object-fit: cover; margin-bottom: 16px;" />
+            <h2 style="color: white; margin: 0; font-size: 24px;">Dra. Luiza Aguera</h2>
+            <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 14px;">Dermatologia</p>
+          </div>
+          <div style="padding: 30px 20px;">
+            <p style="color: #333; font-size: 16px; margin-bottom: 16px;">Olá {{nome}},</p>
+            <p style="color: #333; font-size: 16px; margin-bottom: 24px; line-height: 1.6;">Sua médica adicionou uma nova recomendação no seu portal.</p>
+            <p style="text-align: center; margin: 30px 0;">
+              <a href="${projectUrl}" 
+                 style="background: #5a3dff; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 16px; font-weight: 600;">
+                Acessar Plataforma
+              </a>
+            </p>
+          </div>
+          <div style="background: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e9ecef;">
+            <p style="font-size: 12px; color: #6c757d; margin: 0;">
+              Este e-mail é automático. Por favor, não responda.
+            </p>
+          </div>
         </div>
       `;
     } else if (tipo === "novidade") {
@@ -131,19 +149,28 @@ serve(async (req) => {
 
       emailSubject = "Nova novidade no portal da clínica";
       emailContent = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <p style="color: #333; font-size: 16px; margin-bottom: 16px;">Olá,</p>
-          <p style="color: #333; font-size: 16px; margin-bottom: 8px;">Temos uma nova novidade da clínica para você:</p>
-          <p style="color: #333; font-size: 16px; margin-bottom: 20px;"><strong>${news?.title}</strong></p>
-          <p style="text-align: center; margin: 30px 0;">
-            <a href="${projectUrl}" 
-               style="background: #5a3dff; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 16px;">
-              Acessar plataforma
-            </a>
-          </p>
-          <p style="font-size: 12px; color: #999; margin-top: 30px;">
-            Caso não queira mais receber novidades, acesse suas preferências no portal.
-          </p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="background: linear-gradient(135deg, #5a3dff 0%, #7c3aed 100%); padding: 30px 20px; text-align: center;">
+            <img src="https://agueradermatologia.com.br/logo.jpg" alt="Dra. Luiza Aguera" style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid white; object-fit: cover; margin-bottom: 16px;" />
+            <h2 style="color: white; margin: 0; font-size: 24px;">Dra. Luiza Aguera</h2>
+            <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 14px;">Dermatologia</p>
+          </div>
+          <div style="padding: 30px 20px;">
+            <p style="color: #333; font-size: 16px; margin-bottom: 16px;">Olá,</p>
+            <p style="color: #333; font-size: 16px; margin-bottom: 8px; line-height: 1.6;">Temos uma nova novidade da clínica para você:</p>
+            <p style="color: #5a3dff; font-size: 18px; font-weight: 600; margin-bottom: 24px;">${news?.title}</p>
+            <p style="text-align: center; margin: 30px 0;">
+              <a href="${projectUrl}" 
+                 style="background: #5a3dff; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 16px; font-weight: 600;">
+                Acessar Plataforma
+              </a>
+            </p>
+          </div>
+          <div style="background: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e9ecef;">
+            <p style="font-size: 12px; color: #6c757d; margin: 0;">
+              Caso não queira mais receber novidades, acesse suas preferências no portal.
+            </p>
+          </div>
         </div>
       `;
     }
