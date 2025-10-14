@@ -62,7 +62,7 @@ serve(async (req) => {
       emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
           <div style="background: linear-gradient(135deg, #5a3dff 0%, #7c3aed 100%); padding: 30px 20px; text-align: center;">
-            <img src="https://agueradermatologia.com.br/logo.jpg" alt="Dra. Luiza Aguera" style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid white; object-fit: cover; margin-bottom: 16px;" />
+            <img src="${projectUrl}/logo-aguera.jpeg" alt="Dra. Luiza Aguera" style="width: 100px; height: 100px; border-radius: 50%; border: 4px solid white; object-fit: cover; margin-bottom: 16px; display: inline-block;" />
             <h2 style="color: white; margin: 0; font-size: 24px;">Dra. Luiza Aguera</h2>
             <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 14px;">Dermatologia</p>
           </div>
@@ -102,7 +102,7 @@ serve(async (req) => {
       emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
           <div style="background: linear-gradient(135deg, #5a3dff 0%, #7c3aed 100%); padding: 30px 20px; text-align: center;">
-            <img src="https://agueradermatologia.com.br/logo.jpg" alt="Dra. Luiza Aguera" style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid white; object-fit: cover; margin-bottom: 16px;" />
+            <img src="${projectUrl}/logo-aguera.jpeg" alt="Dra. Luiza Aguera" style="width: 100px; height: 100px; border-radius: 50%; border: 4px solid white; object-fit: cover; margin-bottom: 16px; display: inline-block;" />
             <h2 style="color: white; margin: 0; font-size: 24px;">Dra. Luiza Aguera</h2>
             <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 14px;">Dermatologia</p>
           </div>
@@ -151,7 +151,7 @@ serve(async (req) => {
       emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
           <div style="background: linear-gradient(135deg, #5a3dff 0%, #7c3aed 100%); padding: 30px 20px; text-align: center;">
-            <img src="https://agueradermatologia.com.br/logo.jpg" alt="Dra. Luiza Aguera" style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid white; object-fit: cover; margin-bottom: 16px;" />
+            <img src="${projectUrl}/logo-aguera.jpeg" alt="Dra. Luiza Aguera" style="width: 100px; height: 100px; border-radius: 50%; border: 4px solid white; object-fit: cover; margin-bottom: 16px; display: inline-block;" />
             <h2 style="color: white; margin: 0; font-size: 24px;">Dra. Luiza Aguera</h2>
             <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 14px;">Dermatologia</p>
           </div>
