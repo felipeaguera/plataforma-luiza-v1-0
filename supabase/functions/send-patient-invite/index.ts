@@ -81,27 +81,32 @@ serve(async (req) => {
       to: [patient.email],
       subject: "Ative sua conta - Portal da Paciente",
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Bem-vinda ao Portal da Paciente!</h2>
-          <p>Olá ${patient.full_name},</p>
-          <p>A Dra. Luiza Aguera criou uma conta para você no portal da clínica.</p>
-          <p>Para ativar sua conta e criar sua senha, clique no botão abaixo:</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${activationUrl}" 
-               style="background-color: #4F46E5; color: white; padding: 12px 30px; 
-                      text-decoration: none; border-radius: 6px; display: inline-block;">
-              Ativar Minha Conta
-            </a>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="background: linear-gradient(135deg, #5a3dff 0%, #7c3aed 100%); padding: 30px 20px; text-align: center;">
+            <img src="${projectUrl}/logo-aguera.jpeg" alt="Dra. Luiza Aguera" style="width: 100px; height: 100px; border-radius: 50%; border: 4px solid white; object-fit: cover; margin-bottom: 16px; display: inline-block;" />
+            <h2 style="color: white; margin: 0; font-size: 24px;">Dra. Luiza Aguera</h2>
+            <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 14px;">Dermatologia</p>
           </div>
-          <p style="color: #666; font-size: 14px;">
-            Este link expira em 48 horas.<br>
-            Se você não solicitou esta conta, ignore este email.
-          </p>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-          <p style="color: #999; font-size: 12px;">
-            Dra. Luiza Aguera - Dermatologia<br>
-            Este é um email automático, por favor não responda.
-          </p>
+          <div style="padding: 30px 20px;">
+            <p style="color: #333; font-size: 16px; margin-bottom: 16px;">Olá ${patient.full_name},</p>
+            <p style="color: #333; font-size: 16px; margin-bottom: 16px; line-height: 1.6;">Bem-vinda ao Portal da Paciente! A Dra. Luiza Aguera criou uma conta para você no portal da clínica.</p>
+            <p style="color: #333; font-size: 16px; margin-bottom: 24px; line-height: 1.6;">Para ativar sua conta e criar sua senha, clique no botão abaixo:</p>
+            <p style="text-align: center; margin: 30px 0;">
+              <a href="${activationUrl}" 
+                 style="background: #5a3dff; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 16px; font-weight: 600;">
+                Ativar Minha Conta
+              </a>
+            </p>
+            <p style="color: #666; font-size: 14px; line-height: 1.6; margin-top: 24px;">
+              Este link expira em 48 horas.<br>
+              Se você não solicitou esta conta, ignore este email.
+            </p>
+          </div>
+          <div style="background: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e9ecef;">
+            <p style="font-size: 12px; color: #6c757d; margin: 0;">
+              Este e-mail é automático. Por favor, não responda.
+            </p>
+          </div>
         </div>
       `,
     });
