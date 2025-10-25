@@ -83,29 +83,29 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
 
       // Create a blob URL for the PDF
       const blob = new Blob([data], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
+      const blobUrl = URL.createObjectURL(blob);
       
-      console.log('PDF URL criada:', url);
+      console.log('PDF URL criada:', blobUrl);
       
-      // Open directly in new tab to avoid browser blocking issues
-      const newWindow = window.open(url, '_blank');
+      // Create a temporary link and force click to open in new tab
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
       
-      if (!newWindow) {
-        // If popup was blocked, fallback to modal
-        setViewingExam({ url, title, filePath, fileName });
-        toast({
-          title: "PDF pronto!",
-          description: "Visualize abaixo ou permita pop-ups para melhor experiência",
-        });
-      } else {
-        toast({
-          title: "PDF aberto em nova aba!",
-          description: "Verifique a nova aba do navegador",
-        });
-        
-        // Clean up the URL after a delay
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-      }
+      // Force the browser to open it
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: "PDF aberto!",
+        description: "Verifique a nova aba do navegador",
+      });
+      
+      // Clean up after a delay
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+      
     } catch (error) {
       console.error('Error viewing exam:', error);
       toast({
