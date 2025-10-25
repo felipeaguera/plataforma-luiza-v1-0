@@ -16,7 +16,12 @@ interface PatientExamsListProps {
 
 export function PatientExamsList({ patientId }: PatientExamsListProps) {
   const queryClient = useQueryClient();
-  const [viewingExam, setViewingExam] = useState<{ url: string; title: string } | null>(null);
+  const [viewingExam, setViewingExam] = useState<{ 
+    url: string; 
+    title: string;
+    filePath: string;
+    fileName: string;
+  } | null>(null);
 
   const { data: exams, isLoading } = useQuery({
     queryKey: ['patient-exams', patientId],
@@ -56,22 +61,39 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
     };
   }, [patientId, queryClient]);
 
-  const handleView = async (filePath: string, title: string) => {
+  const handleView = async (filePath: string, fileName: string, title: string) => {
     try {
+      toast({
+        title: "Carregando exame...",
+        description: "Preparando visualização",
+      });
+
       const { data, error } = await supabase.storage
         .from('exams')
         .download(filePath);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Download error:', error);
+        throw error;
+      }
 
-      const url = URL.createObjectURL(data);
-      setViewingExam({ url, title });
+      // Create a blob URL for the PDF
+      const blob = new Blob([data], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      
+      console.log('PDF URL created:', url);
+      setViewingExam({ url, title, filePath, fileName });
+      
+      toast({
+        title: "Exame carregado!",
+        description: "Visualização pronta",
+      });
     } catch (error) {
       console.error('Error viewing exam:', error);
       toast({
         variant: "destructive",
         title: "Erro ao visualizar exame",
-        description: "Não foi possível visualizar o arquivo",
+        description: "Não foi possível visualizar o arquivo. Tente fazer o download.",
       });
     }
   };
@@ -183,7 +205,7 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
                     <div className="flex flex-col sm:flex-row gap-2">
                       <Button
                         size="sm"
-                        onClick={() => handleView(exam.file_path, exam.title)}
+                        onClick={() => handleView(exam.file_path, exam.file_name, exam.title)}
                         className="w-full sm:w-auto"
                       >
                         <Eye size={16} className="mr-2" />
@@ -208,18 +230,45 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
       </CardContent>
 
       <Dialog open={!!viewingExam} onOpenChange={handleCloseViewer}>
-        <DialogContent className="w-[95vw] max-w-4xl h-[85vh] sm:h-[90vh] p-3 sm:p-6">
-          <DialogHeader>
-            <DialogTitle className="text-sm sm:text-base truncate pr-8">{viewingExam?.title}</DialogTitle>
+        <DialogContent className="w-[95vw] max-w-6xl h-[90vh] p-2 sm:p-4">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="text-base sm:text-lg truncate pr-8">{viewingExam?.title}</DialogTitle>
           </DialogHeader>
-          <div className="flex-1 h-[calc(100%-3rem)]">
+          <div className="flex-1 h-[calc(100%-4rem)]">
             {viewingExam && (
               <iframe
-                src={viewingExam.url}
-                className="w-full h-full rounded-lg border border-border"
+                src={`${viewingExam.url}#toolbar=1&navpanes=0&scrollbar=1`}
+                className="w-full h-full rounded-lg border-2 border-border bg-gray-100"
                 title={viewingExam.title}
+                onError={(e) => {
+                  console.error('Iframe error:', e);
+                  toast({
+                    variant: "destructive",
+                    title: "Erro ao exibir PDF",
+                    description: "Use o botão 'Baixar PDF' para visualizar o exame.",
+                  });
+                }}
               />
             )}
+          </div>
+          <div className="flex gap-2 pt-2 border-t">
+            <Button 
+              onClick={() => viewingExam && handleDownload(viewingExam.filePath, viewingExam.fileName)}
+              variant="outline"
+              size="sm"
+              className="flex-1"
+            >
+              <Download size={16} className="mr-2" />
+              Baixar PDF
+            </Button>
+            <Button 
+              onClick={handleCloseViewer}
+              variant="secondary"
+              size="sm"
+              className="flex-1"
+            >
+              Fechar
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
