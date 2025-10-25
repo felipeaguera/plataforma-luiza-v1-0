@@ -1,8 +1,11 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Video, FileText } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Video, FileText, PlayCircle, Sparkles } from 'lucide-react';
 import { useEffect } from 'react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { getVideoEmbedUrl, isDirectVideoUrl } from '@/lib/videoUtils';
 
 interface PatientRecommendationsListProps {
@@ -84,55 +87,75 @@ export function PatientRecommendationsList({ patientId }: PatientRecommendations
       </CardHeader>
       <CardContent>
         {!recommendations || recommendations.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8 text-sm sm:text-base">
-            Nenhuma recomendação disponível no momento
-          </p>
+          <div className="text-center py-12">
+            <div className="inline-flex p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full mb-4">
+              <Sparkles className="text-primary" size={32} />
+            </div>
+            <p className="text-muted-foreground">Nenhuma recomendação disponível no momento</p>
+            <p className="text-xs text-muted-foreground mt-2">Você será notificada quando novas recomendações forem adicionadas</p>
+          </div>
         ) : (
           <div className="space-y-6">
             {recommendations.map((recommendation) => (
-              <div key={recommendation.id} className="border border-border rounded-lg p-3 sm:p-4 space-y-3">
-                <div>
-                  <h4 className="font-semibold text-foreground text-base sm:text-lg">{recommendation.title}</h4>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    {formatDate(recommendation.published_at || recommendation.created_at)}
-                  </p>
-                </div>
+              <div 
+                key={recommendation.id} 
+                className="group relative overflow-hidden border-2 rounded-xl p-5 hover:shadow-lg hover:border-primary/20 transition-all bg-gradient-to-br from-card to-card/50"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        {recommendation.media_type === 'video' && (
+                          <div className="p-1.5 bg-primary/10 rounded-md">
+                            <PlayCircle className="text-primary" size={16} />
+                          </div>
+                        )}
+                        <h4 className="font-semibold text-foreground text-lg">{recommendation.title}</h4>
+                      </div>
+                      <Badge variant="secondary" className="text-xs">
+                        {format(new Date(recommendation.published_at || recommendation.created_at), "dd 'de' MMMM, yyyy", { locale: ptBR })}
+                      </Badge>
+                    </div>
+                  </div>
 
-                {recommendation.content && (
-                  <p className="text-foreground text-sm sm:text-base">{recommendation.content}</p>
-                )}
+                  {recommendation.content && (
+                    <div className="prose prose-sm max-w-none">
+                      <p className="text-foreground leading-relaxed">{recommendation.content}</p>
+                    </div>
+                  )}
 
-                {recommendation.media_url && recommendation.media_type === 'video' && (
-                  <div className="aspect-video rounded-lg overflow-hidden bg-black">
-                    {isDirectVideoUrl(recommendation.media_url) ? (
-                      <video
-                        controls
-                        className="w-full h-full"
+                  {recommendation.media_url && recommendation.media_type === 'video' && (
+                    <div className="aspect-video rounded-xl overflow-hidden shadow-lg border-2 border-border">
+                      {isDirectVideoUrl(recommendation.media_url) ? (
+                        <video
+                          controls
+                          className="w-full h-full bg-black"
+                          src={recommendation.media_url}
+                        >
+                          Seu navegador não suporta vídeos.
+                        </video>
+                      ) : (
+                        <iframe
+                          src={getVideoEmbedUrl(recommendation.media_url) || recommendation.media_url}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          title={recommendation.title}
+                        />
+                      )}
+                    </div>
+                  )}
+
+                  {recommendation.media_url && recommendation.media_type === 'image' && (
+                    <div className="rounded-xl overflow-hidden shadow-lg border-2 border-border">
+                      <img
                         src={recommendation.media_url}
-                      >
-                        Seu navegador não suporta vídeos.
-                      </video>
-                    ) : (
-                      <iframe
-                        src={getVideoEmbedUrl(recommendation.media_url) || recommendation.media_url}
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        title={recommendation.title}
+                        alt={recommendation.title}
+                        className="w-full h-auto"
                       />
-                    )}
-                  </div>
-                )}
-
-                {recommendation.media_url && recommendation.media_type === 'image' && (
-                  <div className="rounded-lg overflow-hidden">
-                    <img
-                      src={recommendation.media_url}
-                      alt={recommendation.title}
-                      className="w-full h-auto"
-                    />
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>

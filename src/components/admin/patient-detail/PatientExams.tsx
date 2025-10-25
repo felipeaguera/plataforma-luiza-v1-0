@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, FileText, Download, Eye, Trash2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Plus, FileText, Download, Eye, Trash2, Calendar, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -109,52 +110,78 @@ export function PatientExams({ patientId }: PatientExamsProps) {
           {isLoading ? (
             <p className="text-muted-foreground text-center py-8">Carregando exames...</p>
           ) : exams.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">Nenhum exame cadastrado</p>
+            <div className="text-center py-12">
+              <div className="inline-flex p-4 bg-muted rounded-full mb-4">
+                <FileText className="text-muted-foreground" size={32} />
+              </div>
+              <p className="text-muted-foreground">Nenhum exame cadastrado</p>
+            </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid gap-4">
               {exams.map((exam) => (
-                <div key={exam.id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-primary/10 rounded-lg">
-                      <FileText className="text-primary" size={24} />
+                <div 
+                  key={exam.id} 
+                  className="group relative overflow-hidden border rounded-xl p-5 hover:shadow-md transition-all bg-card"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-4 flex-1">
+                      <div className="p-3 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl shadow-sm">
+                        <FileText className="text-primary" size={28} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-foreground text-lg mb-2">{exam.title}</h4>
+                        
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {exam.exam_date && (
+                            <Badge variant="secondary" className="text-xs">
+                              <Calendar size={12} className="mr-1" />
+                              {format(new Date(exam.exam_date), "dd/MM/yyyy", { locale: ptBR })}
+                            </Badge>
+                          )}
+                          <Badge variant="outline" className="text-xs">
+                            <Clock size={12} className="mr-1" />
+                            {format(new Date(exam.created_at), "dd/MM/yyyy", { locale: ptBR })}
+                          </Badge>
+                          {exam.file_size && (
+                            <Badge variant="outline" className="text-xs">
+                              {(exam.file_size / 1024 / 1024).toFixed(2)} MB
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        {exam.description && (
+                          <p className="text-sm text-muted-foreground line-clamp-2">{exam.description}</p>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-medium">{exam.title}</h4>
-                      {exam.exam_date && (
-                        <p className="text-sm text-muted-foreground">
-                          Data do exame: {format(new Date(exam.exam_date), "dd/MM/yyyy", { locale: ptBR })}
-                        </p>
-                      )}
-                      {exam.description && (
-                        <p className="text-sm text-muted-foreground">{exam.description}</p>
-                      )}
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Cadastrado em: {format(new Date(exam.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                      </p>
+                    
+                    <div className="flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleView(exam.file_path)}
+                        title="Visualizar"
+                      >
+                        <Eye size={18} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDownload(exam.file_path, exam.file_name)}
+                        title="Baixar"
+                      >
+                        <Download size={18} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setExamToDelete(exam.id)}
+                        title="Excluir"
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 size={18} />
+                      </Button>
                     </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleView(exam.file_path)}
-                    >
-                      <Eye size={16} />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDownload(exam.file_path, exam.file_name)}
-                    >
-                      <Download size={16} />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setExamToDelete(exam.id)}
-                    >
-                      <Trash2 size={16} />
-                    </Button>
                   </div>
                 </div>
               ))}

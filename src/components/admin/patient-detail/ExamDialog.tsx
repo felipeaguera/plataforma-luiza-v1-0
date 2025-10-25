@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,10 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Upload, CalendarIcon } from 'lucide-react';
+import { Upload, CalendarIcon, FileText, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -26,6 +27,9 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
   const [examDate, setExamDate] = useState<Date>();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,17 +47,23 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
     }
 
     setIsUploading(true);
+    setUploadProgress(10);
+    
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `${patientId}/${fileName}`;
 
+      setUploadProgress(30);
       const { error: uploadError } = await supabase.storage
         .from('exams')
         .upload(filePath, file);
+      
+      setUploadProgress(60);
 
       if (uploadError) throw uploadError;
 
+      setUploadProgress(80);
       const { data: examData, error: insertError } = await supabase
         .from('exams')
         .insert({
@@ -70,6 +80,7 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
         .single();
 
       if (insertError) throw insertError;
+      setUploadProgress(100);
 
       // Send notification
       if (examData) {
@@ -96,6 +107,7 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
       setDescription('');
       setExamDate(undefined);
       setFile(null);
+      setUploadProgress(0);
     } catch (error: any) {
       console.error('Error uploading exam:', error);
       if (error?.statusCode === '413' || error?.message?.includes('exceeded')) {
@@ -105,6 +117,36 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
       }
     } finally {
       setIsUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile && droppedFile.type === 'application/pdf') {
+      setFile(droppedFile);
+    } else {
+      toast.error('Por favor, selecione apenas arquivos PDF');
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
     }
   };
 
@@ -167,23 +209,75 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
 
           <div>
             <Label htmlFor="file">Arquivo PDF * (máx. 50MB)</Label>
-            <div className="mt-2">
+            <div 
+              className={cn(
+                "mt-2 border-2 border-dashed rounded-lg p-6 transition-all",
+                isDragging ? "border-primary bg-primary/5" : "border-border",
+                file ? "bg-accent/50" : "bg-background"
+              )}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
               <input
+                ref={fileInputRef}
                 type="file"
                 accept=".pdf"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                onChange={handleFileSelect}
                 className="hidden"
                 id="file-upload"
                 required
               />
-              <label htmlFor="file-upload">
-                <Button type="button" variant="outline" className="w-full" asChild>
-                  <span className="cursor-pointer flex items-center justify-center">
-                    <Upload className="mr-2" size={16} />
-                    {file ? `${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB)` : 'Selecionar arquivo PDF'}
-                  </span>
-                </Button>
-              </label>
+              
+              {file ? (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <FileText className="text-primary" size={24} />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">{file.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setFile(null)}
+                    disabled={isUploading}
+                  >
+                    <X size={16} />
+                  </Button>
+                </div>
+              ) : (
+                <label htmlFor="file-upload" className="cursor-pointer">
+                  <div className="flex flex-col items-center gap-2 text-center">
+                    <div className="p-3 bg-primary/10 rounded-full">
+                      <Upload className="text-primary" size={24} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">
+                        Arraste seu arquivo PDF aqui
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        ou clique para selecionar
+                      </p>
+                    </div>
+                  </div>
+                </label>
+              )}
+              
+              {isUploading && (
+                <div className="mt-4 space-y-2">
+                  <Progress value={uploadProgress} />
+                  <p className="text-xs text-center text-muted-foreground">
+                    Enviando... {uploadProgress}%
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
