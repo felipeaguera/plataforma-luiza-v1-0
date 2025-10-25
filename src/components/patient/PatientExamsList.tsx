@@ -3,10 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { FileText, Download, Calendar, Eye, FileCheck } from 'lucide-react';
+import { FileText, Download, Calendar, FileCheck } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -16,12 +15,6 @@ interface PatientExamsListProps {
 
 export function PatientExamsList({ patientId }: PatientExamsListProps) {
   const queryClient = useQueryClient();
-  const [viewingExam, setViewingExam] = useState<{ 
-    url: string; 
-    title: string;
-    filePath: string;
-    fileName: string;
-  } | null>(null);
 
   const { data: exams, isLoading } = useQuery({
     queryKey: ['patient-exams', patientId],
@@ -61,54 +54,6 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
     };
   }, [patientId, queryClient]);
 
-  const handleView = async (filePath: string, fileName: string, title: string) => {
-    try {
-      console.log('Abrindo exame:', { filePath, fileName, title });
-      
-      toast({
-        title: "Abrindo exame...",
-        description: "O arquivo será baixado e aberto automaticamente",
-      });
-
-      const { data, error } = await supabase.storage
-        .from('exams')
-        .download(filePath);
-
-      if (error) {
-        console.error('Download error:', error);
-        throw error;
-      }
-
-      // Create blob and download it - browser will open it automatically
-      const blob = new Blob([data], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
-      link.href = url;
-      // Don't set download attribute - let browser open it
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Clean up
-      setTimeout(() => URL.revokeObjectURL(url), 100);
-      
-      toast({
-        title: "Exame aberto!",
-        description: "Verifique se uma nova aba foi aberta",
-      });
-      
-    } catch (error) {
-      console.error('Error viewing exam:', error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao abrir exame",
-        description: "Tente usar o botão 'Baixar PDF' como alternativa.",
-      });
-    }
-  };
-
   const handleDownload = async (filePath: string, fileName: string) => {
     try {
       const { data, error } = await supabase.storage
@@ -125,6 +70,11 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Download iniciado!",
+        description: "O arquivo está sendo baixado",
+      });
     } catch (error) {
       console.error('Error downloading exam:', error);
       toast({
@@ -133,18 +83,6 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
         description: "Não foi possível fazer o download do arquivo",
       });
     }
-  };
-
-  const handleCloseViewer = () => {
-    if (viewingExam?.url) {
-      URL.revokeObjectURL(viewingExam.url);
-    }
-    setViewingExam(null);
-  };
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Data não informada';
-    return new Date(dateString).toLocaleDateString('pt-BR');
   };
 
   if (isLoading) {
@@ -216,20 +154,11 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
                     <div className="flex flex-col sm:flex-row gap-2">
                       <Button
                         size="sm"
-                        onClick={() => handleView(exam.file_path, exam.file_name, exam.title)}
-                        className="w-full sm:w-auto"
-                      >
-                        <Eye size={16} className="mr-2" />
-                        Abrir PDF
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
                         onClick={() => handleDownload(exam.file_path, exam.file_name)}
-                        className="w-full sm:w-auto"
+                        className="w-full"
                       >
                         <Download size={16} className="mr-2" />
-                        Baixar e Salvar
+                        Baixar Exame
                       </Button>
                     </div>
                   </div>
@@ -239,71 +168,6 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
           </div>
         )}
       </CardContent>
-
-      <Dialog open={!!viewingExam} onOpenChange={handleCloseViewer}>
-        <DialogContent className="w-[95vw] max-w-6xl h-[90vh] p-2 sm:p-4">
-          <DialogHeader className="pb-2">
-            <DialogTitle className="text-base sm:text-lg truncate pr-8">{viewingExam?.title}</DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 h-[calc(100%-4rem)] bg-gray-100 rounded-lg">
-            {viewingExam && (
-              <>
-                <iframe
-                  src={`${viewingExam.url}#toolbar=1&navpanes=0&scrollbar=1&view=FitH`}
-                  className="w-full h-full rounded-lg border-2 border-border"
-                  title={viewingExam.title}
-                  onLoad={() => {
-                    console.log('Iframe carregado com sucesso');
-                  }}
-                  onError={(e) => {
-                    console.error('Iframe error:', e);
-                    toast({
-                      variant: "destructive",
-                      title: "Erro ao exibir PDF",
-                      description: "Seu navegador pode não suportar visualização de PDFs. Use o botão 'Baixar PDF'.",
-                    });
-                  }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 peer-[iframe]:opacity-100">
-                  <p className="text-sm text-muted-foreground">Carregando PDF...</p>
-                </div>
-              </>
-            )}
-          </div>
-          <div className="flex gap-2 pt-2 border-t">
-            <Button 
-              onClick={() => {
-                if (viewingExam) {
-                  // Abre o PDF em nova aba como alternativa
-                  window.open(viewingExam.url, '_blank');
-                }
-              }}
-              variant="outline"
-              size="sm"
-              className="flex-1"
-            >
-              <Eye size={16} className="mr-2" />
-              Abrir em Nova Aba
-            </Button>
-            <Button 
-              onClick={() => viewingExam && handleDownload(viewingExam.filePath, viewingExam.fileName)}
-              variant="outline"
-              size="sm"
-              className="flex-1"
-            >
-              <Download size={16} className="mr-2" />
-              Baixar PDF
-            </Button>
-            <Button 
-              onClick={handleCloseViewer}
-              variant="secondary"
-              size="sm"
-            >
-              Fechar
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </Card>
   );
 }
