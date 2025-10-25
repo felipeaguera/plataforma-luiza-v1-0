@@ -167,11 +167,18 @@ export default function ClinicNewsPage() {
                   </div>
 
                   {item.media_url && item.media_type === 'image' && (
-                    <div className="mt-4">
+                    <div className="mt-4 rounded-xl overflow-hidden border-2 border-border">
                       <img
                         src={item.media_url}
                         alt={item.title}
-                        className="w-full max-h-48 object-cover rounded-lg"
+                        className="w-full max-h-64 object-cover"
+                        onError={(e) => {
+                          console.error('Erro ao carregar imagem:', item.media_url);
+                          e.currentTarget.style.display = 'none';
+                        }}
+                        onLoad={(e) => {
+                          console.log('Imagem carregada com sucesso:', item.media_url);
+                        }}
                       />
                     </div>
                   )}

@@ -1,14 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Progress } from '@/components/ui/progress';
 import { useClinicNews } from '@/hooks/useClinicNews';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Loader2, Upload, X } from 'lucide-react';
+import { Loader2, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface ClinicNewsDialogProps {
   open: boolean;
@@ -23,6 +25,9 @@ export function ClinicNewsDialog({ open, onOpenChange, news }: ClinicNewsDialogP
   const [mediaType, setMediaType] = useState<'image' | 'video' | 'none'>('none');
   const [mediaUrl, setMediaUrl] = useState('');
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (news) {
@@ -52,23 +57,28 @@ export function ClinicNewsDialog({ open, onOpenChange, news }: ClinicNewsDialogP
     }
 
     setUploadingFile(true);
+    setUploadProgress(10);
+    
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
 
+      setUploadProgress(30);
       const { error: uploadError } = await supabase.storage
         .from('news')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
+      setUploadProgress(60);
       const { data: { publicUrl } } = supabase.storage
         .from('news')
         .getPublicUrl(filePath);
 
       setMediaUrl(publicUrl);
       setMediaType('image');
+      setUploadProgress(100);
       
       toast({
         title: 'Sucesso',
@@ -83,6 +93,33 @@ export function ClinicNewsDialog({ open, onOpenChange, news }: ClinicNewsDialogP
       });
     } finally {
       setUploadingFile(false);
+      setTimeout(() => setUploadProgress(0), 500);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile && droppedFile.type.startsWith('image/')) {
+      handleFileUpload(droppedFile);
+    } else {
+      toast({
+        title: 'Erro',
+        description: 'Por favor, selecione apenas imagens',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -205,36 +242,110 @@ export function ClinicNewsDialog({ open, onOpenChange, news }: ClinicNewsDialogP
           </div>
 
           {mediaType === 'image' && (
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label>Imagem</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleFileUpload(file);
-                  }}
-                  disabled={uploadingFile}
-                />
-                {uploadingFile && <Loader2 className="animate-spin" size={20} />}
-              </div>
-              {mediaUrl && (
-                <div className="relative mt-2">
+              
+              {!mediaUrl ? (
+                <div 
+                  className={cn(
+                    "border-2 border-dashed rounded-xl p-8 transition-all cursor-pointer",
+                    isDragging ? "border-primary bg-primary/5 scale-[1.02]" : "border-border hover:border-primary/50",
+                    uploadingFile && "pointer-events-none opacity-60"
+                  )}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileUpload(file);
+                    }}
+                    className="hidden"
+                  />
+                  
+                  <div className="flex flex-col items-center gap-3 text-center">
+                    <div className="p-4 bg-primary/10 rounded-full">
+                      {uploadingFile ? (
+                        <Loader2 className="animate-spin text-primary" size={32} />
+                      ) : (
+                        <ImageIcon className="text-primary" size={32} />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">
+                        {uploadingFile ? 'Enviando imagem...' : 'Arraste sua imagem aqui'}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        ou clique para selecionar
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        PNG, JPG, WEBP até 5MB
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {uploadingFile && uploadProgress > 0 && (
+                    <div className="mt-4">
+                      <Progress value={uploadProgress} className="h-2" />
+                      <p className="text-xs text-center text-muted-foreground mt-2">
+                        {uploadProgress}%
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="relative group rounded-xl overflow-hidden border-2 border-border hover:border-primary/50 transition-all">
                   <img 
                     src={mediaUrl} 
                     alt="Preview" 
-                    className="w-full max-h-48 object-cover rounded-lg"
+                    className="w-full h-64 object-cover"
+                    onError={(e) => {
+                      console.error('Erro ao carregar imagem:', mediaUrl);
+                      toast({
+                        title: 'Erro',
+                        description: 'Não foi possível carregar a imagem. Tente fazer upload novamente.',
+                        variant: 'destructive',
+                      });
+                    }}
                   />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-2 right-2"
-                    onClick={() => setMediaUrl('')}
-                  >
-                    <X size={16} />
-                  </Button>
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Upload size={16} className="mr-2" />
+                      Trocar imagem
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        setMediaUrl('');
+                        setMediaType('none');
+                      }}
+                    >
+                      <X size={16} className="mr-2" />
+                      Remover
+                    </Button>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileUpload(file);
+                    }}
+                    className="hidden"
+                  />
                 </div>
               )}
             </div>
