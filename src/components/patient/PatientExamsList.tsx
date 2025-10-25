@@ -63,11 +63,11 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
 
   const handleView = async (filePath: string, fileName: string, title: string) => {
     try {
-      console.log('Iniciando visualização do exame:', { filePath, fileName, title });
+      console.log('Abrindo exame:', { filePath, fileName, title });
       
       toast({
-        title: "Carregando exame...",
-        description: "Preparando visualização",
+        title: "Abrindo exame...",
+        description: "O arquivo será baixado e aberto automaticamente",
       });
 
       const { data, error } = await supabase.storage
@@ -79,39 +79,32 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
         throw error;
       }
 
-      console.log('Arquivo baixado com sucesso:', data.size, 'bytes');
-
-      // Create a blob URL for the PDF
+      // Create blob and download it - browser will open it automatically
       const blob = new Blob([data], { type: 'application/pdf' });
-      const blobUrl = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
       
-      console.log('PDF URL criada:', blobUrl);
-      
-      // Create a temporary link and force click to open in new tab
       const link = document.createElement('a');
-      link.href = blobUrl;
+      link.href = url;
+      // Don't set download attribute - let browser open it
       link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      
-      // Force the browser to open it
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       
-      toast({
-        title: "PDF aberto!",
-        description: "Verifique a nova aba do navegador",
-      });
+      // Clean up
+      setTimeout(() => URL.revokeObjectURL(url), 100);
       
-      // Clean up after a delay
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+      toast({
+        title: "Exame aberto!",
+        description: "Verifique se uma nova aba foi aberta",
+      });
       
     } catch (error) {
       console.error('Error viewing exam:', error);
       toast({
         variant: "destructive",
-        title: "Erro ao visualizar exame",
-        description: "Não foi possível visualizar o arquivo. Tente fazer o download.",
+        title: "Erro ao abrir exame",
+        description: "Tente usar o botão 'Baixar PDF' como alternativa.",
       });
     }
   };
@@ -227,7 +220,7 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
                         className="w-full sm:w-auto"
                       >
                         <Eye size={16} className="mr-2" />
-                        Visualizar
+                        Abrir PDF
                       </Button>
                       <Button
                         size="sm"
@@ -236,7 +229,7 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
                         className="w-full sm:w-auto"
                       >
                         <Download size={16} className="mr-2" />
-                        Baixar PDF
+                        Baixar e Salvar
                       </Button>
                     </div>
                   </div>
