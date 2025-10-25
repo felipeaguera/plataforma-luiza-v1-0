@@ -63,6 +63,8 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
 
   const handleView = async (filePath: string, fileName: string, title: string) => {
     try {
+      console.log('Iniciando visualização do exame:', { filePath, fileName, title });
+      
       toast({
         title: "Carregando exame...",
         description: "Preparando visualização",
@@ -77,11 +79,15 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
         throw error;
       }
 
+      console.log('Arquivo baixado com sucesso:', data.size, 'bytes');
+
       // Create a blob URL for the PDF
       const blob = new Blob([data], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       
-      console.log('PDF URL created:', url);
+      console.log('PDF URL criada:', url);
+      console.log('Blob type:', blob.type, 'size:', blob.size);
+      
       setViewingExam({ url, title, filePath, fileName });
       
       toast({
@@ -234,24 +240,46 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
           <DialogHeader className="pb-2">
             <DialogTitle className="text-base sm:text-lg truncate pr-8">{viewingExam?.title}</DialogTitle>
           </DialogHeader>
-          <div className="flex-1 h-[calc(100%-4rem)]">
+          <div className="flex-1 h-[calc(100%-4rem)] bg-gray-100 rounded-lg">
             {viewingExam && (
-              <iframe
-                src={`${viewingExam.url}#toolbar=1&navpanes=0&scrollbar=1`}
-                className="w-full h-full rounded-lg border-2 border-border bg-gray-100"
-                title={viewingExam.title}
-                onError={(e) => {
-                  console.error('Iframe error:', e);
-                  toast({
-                    variant: "destructive",
-                    title: "Erro ao exibir PDF",
-                    description: "Use o botão 'Baixar PDF' para visualizar o exame.",
-                  });
-                }}
-              />
+              <>
+                <iframe
+                  src={`${viewingExam.url}#toolbar=1&navpanes=0&scrollbar=1&view=FitH`}
+                  className="w-full h-full rounded-lg border-2 border-border"
+                  title={viewingExam.title}
+                  onLoad={() => {
+                    console.log('Iframe carregado com sucesso');
+                  }}
+                  onError={(e) => {
+                    console.error('Iframe error:', e);
+                    toast({
+                      variant: "destructive",
+                      title: "Erro ao exibir PDF",
+                      description: "Seu navegador pode não suportar visualização de PDFs. Use o botão 'Baixar PDF'.",
+                    });
+                  }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 peer-[iframe]:opacity-100">
+                  <p className="text-sm text-muted-foreground">Carregando PDF...</p>
+                </div>
+              </>
             )}
           </div>
           <div className="flex gap-2 pt-2 border-t">
+            <Button 
+              onClick={() => {
+                if (viewingExam) {
+                  // Abre o PDF em nova aba como alternativa
+                  window.open(viewingExam.url, '_blank');
+                }
+              }}
+              variant="outline"
+              size="sm"
+              className="flex-1"
+            >
+              <Eye size={16} className="mr-2" />
+              Abrir em Nova Aba
+            </Button>
             <Button 
               onClick={() => viewingExam && handleDownload(viewingExam.filePath, viewingExam.fileName)}
               variant="outline"
@@ -265,7 +293,6 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
               onClick={handleCloseViewer}
               variant="secondary"
               size="sm"
-              className="flex-1"
             >
               Fechar
             </Button>
