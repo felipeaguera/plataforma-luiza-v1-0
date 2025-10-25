@@ -86,14 +86,26 @@ export function PatientExamsList({ patientId }: PatientExamsListProps) {
       const url = URL.createObjectURL(blob);
       
       console.log('PDF URL criada:', url);
-      console.log('Blob type:', blob.type, 'size:', blob.size);
       
-      setViewingExam({ url, title, filePath, fileName });
+      // Open directly in new tab to avoid browser blocking issues
+      const newWindow = window.open(url, '_blank');
       
-      toast({
-        title: "Exame carregado!",
-        description: "Visualização pronta",
-      });
+      if (!newWindow) {
+        // If popup was blocked, fallback to modal
+        setViewingExam({ url, title, filePath, fileName });
+        toast({
+          title: "PDF pronto!",
+          description: "Visualize abaixo ou permita pop-ups para melhor experiência",
+        });
+      } else {
+        toast({
+          title: "PDF aberto em nova aba!",
+          description: "Verifique a nova aba do navegador",
+        });
+        
+        // Clean up the URL after a delay
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
     } catch (error) {
       console.error('Error viewing exam:', error);
       toast({
