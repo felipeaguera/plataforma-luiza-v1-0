@@ -1,9 +1,13 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bell } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Badge } from '@/components/ui/badge';
+import { Bell, Calendar, Sparkles } from 'lucide-react';
 import { useEffect } from 'react';
 import { getVideoEmbedUrl, isDirectVideoUrl } from '@/lib/videoUtils';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 export function ClinicNewsTimeline() {
   const queryClient = useQueryClient();
@@ -45,16 +49,6 @@ export function ClinicNewsTimeline() {
     };
   }, [queryClient]);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
   if (isLoading) {
     return (
       <Card>
@@ -72,49 +66,64 @@ export function ClinicNewsTimeline() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-          <Bell className="text-primary" size={20} />
+    <Card className="overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Sparkles className="text-primary" size={22} />
           Novidades da Clínica
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6">
         {!news || news.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8 text-sm sm:text-base">
-            Nenhuma novidade publicada ainda
-          </p>
+          <div className="text-center py-12">
+            <div className="inline-flex p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full mb-4">
+              <Bell className="text-primary" size={32} />
+            </div>
+            <p className="text-muted-foreground">Nenhuma novidade publicada ainda</p>
+            <p className="text-xs text-muted-foreground mt-2">Fique atenta! Publicaremos novidades em breve</p>
+          </div>
         ) : (
-          <div className="space-y-6">
-            {news.map((item, index) => (
-              <div key={item.id} className="relative">
-                {index !== news.length - 1 && (
-                  <div className="absolute left-2 sm:left-3 top-8 bottom-0 w-px bg-border" />
-                )}
-                <div className="flex gap-3 sm:gap-4">
-                  <div className="relative z-10 flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary rounded-full border-2 sm:border-4 border-background" />
-                  <div className="flex-1 pb-6">
-                    <div className="bg-accent/50 rounded-lg p-3 sm:p-4 space-y-2">
-                      <div className="flex items-start justify-between gap-2 sm:gap-4">
-                        <h4 className="font-semibold text-foreground text-sm sm:text-base">{item.title}</h4>
-                        <p className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
-                          {formatDate(item.published_at || item.created_at)}
-                        </p>
+          <Carousel
+            opts={{
+              align: "start",
+              loop: false,
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-4">
+              {news.map((item) => (
+                <CarouselItem key={item.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                  <div className="h-full">
+                    <div className="group relative overflow-hidden rounded-2xl border-2 border-border hover:border-primary/50 transition-all bg-gradient-to-br from-card to-card/50 h-full flex flex-col shadow-lg hover:shadow-xl">
+                      {/* Header com título e data */}
+                      <div className="p-4 border-b bg-gradient-to-r from-primary/5 to-transparent">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <h4 className="font-bold text-foreground text-base line-clamp-2 flex-1">
+                            {item.title}
+                          </h4>
+                        </div>
+                        <Badge variant="secondary" className="text-xs mt-2">
+                          <Calendar size={12} className="mr-1" />
+                          {format(new Date(item.published_at || item.created_at), "dd MMM, yyyy", { locale: ptBR })}
+                        </Badge>
                       </div>
-                      <p className="text-foreground text-sm sm:text-base">{item.content}</p>
-                      
+
+                      {/* Mídia - Imagem ou Vídeo */}
                       {item.media_url && item.media_type === 'image' && (
-                        <div className="mt-3 rounded-lg overflow-hidden">
+                        <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10">
                           <img
                             src={item.media_url}
                             alt={item.title}
-                            className="w-full h-auto"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
                           />
                         </div>
                       )}
-                      
+
                       {item.media_url && item.media_type === 'video' && (
-                        <div className="mt-3 aspect-video rounded-lg overflow-hidden bg-black">
+                        <div className="relative aspect-video overflow-hidden bg-black">
                           {isDirectVideoUrl(item.media_url) ? (
                             <video
                               controls
@@ -134,12 +143,33 @@ export function ClinicNewsTimeline() {
                           )}
                         </div>
                       )}
+
+                      {/* Conteúdo */}
+                      <div className="p-4 flex-1">
+                        <p className="text-foreground text-sm leading-relaxed line-clamp-4">
+                          {item.content}
+                        </p>
+                      </div>
+
+                      {/* Indicador de novo */}
+                      {news.indexOf(item) === 0 && (
+                        <div className="absolute top-2 right-2">
+                          <Badge className="bg-primary text-primary-foreground shadow-lg animate-pulse">
+                            <Sparkles size={12} className="mr-1" />
+                            Novo
+                          </Badge>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-center gap-2 mt-6">
+              <CarouselPrevious className="relative static transform-none" />
+              <CarouselNext className="relative static transform-none" />
+            </div>
+          </Carousel>
         )}
       </CardContent>
     </Card>
