@@ -83,7 +83,7 @@ const PatientPortal = () => {
       <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-6 sm:space-y-8">
         <div className="mb-4 sm:mb-8">
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
-            Bem-vinda, {patient.full_name}!
+            Bem-vindo(a), {patient.full_name}!
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground">
             Acesse seus exames, recomendações e novidades da clínica

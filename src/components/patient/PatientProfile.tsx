@@ -152,13 +152,6 @@ export function PatientProfile({ patient, onPhotoUpdate }: PatientProfileProps) 
             </div>
           )}
         </div>
-
-        {patient.additional_info && (
-          <div>
-            <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">Informações Adicionais</p>
-            <p className="text-foreground text-xs sm:text-sm">{patient.additional_info}</p>
-          </div>
-        )}
       </CardContent>
     </Card>
   );
