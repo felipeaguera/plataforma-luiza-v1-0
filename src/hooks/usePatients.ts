@@ -70,6 +70,7 @@ export function usePatients() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
+      queryClient.invalidateQueries({ queryKey: ['patient'] });
     },
   });
 
