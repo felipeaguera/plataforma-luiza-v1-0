@@ -100,7 +100,7 @@ export function PatientsList() {
                       <TableCell>{patient.email}</TableCell>
                       <TableCell>{patient.phone || '-'}</TableCell>
                       <TableCell>
-                        {format(new Date(patient.birth_date), 'dd/MM/yyyy', { locale: ptBR })}
+                        {format(new Date(patient.birth_date + 'T00:00:00'), 'dd/MM/yyyy', { locale: ptBR })}
                       </TableCell>
                       <TableCell>{getStatusBadge(patient)}</TableCell>
                       <TableCell className="text-right">

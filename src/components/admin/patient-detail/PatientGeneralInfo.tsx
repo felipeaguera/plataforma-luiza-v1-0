@@ -136,7 +136,7 @@ export function PatientGeneralInfo({ patient }: PatientGeneralInfoProps) {
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Data de Nascimento</label>
                 <p className="text-foreground mt-1">
-                  {format(new Date(patient.birth_date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                  {format(new Date(patient.birth_date + 'T00:00:00'), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                 </p>
               </div>
               <div>

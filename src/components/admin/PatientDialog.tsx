@@ -27,7 +27,7 @@ const patientSchema = z.object({
   birth_date: z.string()
     .min(1, 'Data de nascimento é obrigatória')
     .refine((date) => {
-      const birthDate = new Date(date);
+      const birthDate = new Date(date + 'T00:00:00');
       const today = new Date();
       const age = today.getFullYear() - birthDate.getFullYear();
       return age >= 1;
