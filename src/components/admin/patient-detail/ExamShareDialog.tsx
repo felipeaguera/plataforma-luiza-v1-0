@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
-import { Copy, RefreshCw, Printer, ExternalLink, QrCode } from 'lucide-react';
+import { Copy, RefreshCw, Printer, ExternalLink, QrCode, AlertCircle } from 'lucide-react';
 import { useExamShare } from '@/hooks/useExamShares';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
@@ -16,10 +16,19 @@ export function ExamShareDialog({ examId, examTitle, examDate, patientName }: Ex
   const { share, isLoading, createShare, getShareUrl, copyShareUrl } = useExamShare(examId);
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleOpenDialog = () => {
-    setIsOpen(true);
-    if (!share && !isLoading) {
-      createShare.mutate();
+  const handleOpenDialog = async () => {
+    // Se não há share, criar primeiro antes de abrir o dialog
+    if (!share && !isLoading && !createShare.isPending) {
+      createShare.mutate(undefined, {
+        onSuccess: () => {
+          setIsOpen(true);
+        },
+        onError: () => {
+          setIsOpen(true); // Abre mesmo com erro para mostrar a mensagem
+        }
+      });
+    } else {
+      setIsOpen(true);
     }
   };
 
@@ -53,9 +62,22 @@ export function ExamShareDialog({ examId, examTitle, examDate, patientName }: Ex
           <DialogTitle>Acesso rápido ao laudo</DialogTitle>
         </DialogHeader>
         
-        {isLoading || !share ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        {isLoading || createShare.isPending || !share ? (
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-muted-foreground">
+              {createShare.isPending ? 'Gerando link de acesso...' : 'Carregando...'}
+            </p>
+          </div>
+        ) : createShare.isError ? (
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <AlertCircle className="w-12 h-12 text-destructive" />
+            <p className="text-sm text-center text-muted-foreground max-w-md">
+              Não foi possível gerar o QR Code. Tente novamente ou contate o suporte.
+            </p>
+            <Button onClick={() => createShare.mutate()} variant="outline">
+              Tentar novamente
+            </Button>
           </div>
         ) : (
           <>
