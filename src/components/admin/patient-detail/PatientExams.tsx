@@ -3,14 +3,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, FileText, Download, Eye, Trash2, Calendar, Clock } from 'lucide-react';
+import { Plus, FileText, Download, Eye, Trash2, Calendar, Clock, QrCode } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ExamDialog } from './ExamDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { ExamShareBlock } from './ExamShareBlock';
+import { ExamShareDialog } from './ExamShareDialog';
 
 interface PatientExamsProps {
   patientId: string;
@@ -174,6 +174,12 @@ export function PatientExams({ patientId, patientName }: PatientExamsProps) {
                       >
                         <Download size={18} />
                       </Button>
+                      <ExamShareDialog
+                        examId={exam.id}
+                        examTitle={exam.title}
+                        examDate={exam.exam_date}
+                        patientName={patientName}
+                      />
                       <Button
                         variant="ghost"
                         size="icon"
@@ -184,16 +190,6 @@ export function PatientExams({ patientId, patientName }: PatientExamsProps) {
                         <Trash2 size={18} />
                       </Button>
                     </div>
-                  </div>
-                  
-                  {/* QR Code Share Block */}
-                  <div className="mt-4 pt-4 border-t">
-                    <ExamShareBlock 
-                      examId={exam.id}
-                      examTitle={exam.title}
-                      examDate={exam.exam_date}
-                      patientName={patientName}
-                    />
                   </div>
                 </div>
               ))}
