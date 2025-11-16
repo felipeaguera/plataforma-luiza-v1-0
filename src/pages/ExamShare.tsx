@@ -3,8 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, AlertCircle } from 'lucide-react';
+import { FileText, AlertCircle, Copy, Printer } from 'lucide-react';
 import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 export default function ExamShare() {
   const { token } = useParams<{ token: string }>();
@@ -53,7 +54,21 @@ export default function ExamShare() {
       window.open(data.signedUrl, '_blank');
     } catch (error) {
       console.error('Error viewing exam:', error);
+      toast.error('Erro ao visualizar laudo');
     }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success('Link copiado!');
+    } catch (error) {
+      toast.error('Erro ao copiar link');
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
   };
 
   if (isLoading) {
@@ -86,47 +101,88 @@ export default function ExamShare() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="max-w-md w-full">
-        <CardHeader className="text-center space-y-4">
-          <div className="flex justify-center">
-            <img 
-              src="/logo-aguera.jpeg" 
-              alt="Clínica Agüera" 
-              className="h-16 object-contain"
-            />
-          </div>
-          <CardTitle>Acesso ao seu laudo</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-            <p className="text-sm font-medium">Exame:</p>
-            <p className="text-foreground">{shareData.exams.title}</p>
-            {shareData.exams.exam_date && (
-              <>
-                <p className="text-sm font-medium mt-3">Data do exame:</p>
-                <p className="text-foreground">
-                  {new Date(shareData.exams.exam_date + 'T00:00:00').toLocaleDateString('pt-BR')}
-                </p>
-              </>
-            )}
-          </div>
+    <>
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="max-w-md w-full print-content">
+          <CardHeader className="text-center space-y-4">
+            <div className="flex justify-center">
+              <img 
+                src="/logo-aguera.jpeg" 
+                alt="Clínica Agüera" 
+                className="h-20 object-contain"
+              />
+            </div>
+            <CardTitle className="text-2xl">Acesso ao seu laudo</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Exame:</p>
+                <p className="text-lg font-medium">{shareData.exams.title}</p>
+              </div>
+              {shareData.exams.exam_date && (
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Data do exame:</p>
+                  <p className="text-lg font-medium">
+                    {new Date(shareData.exams.exam_date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                  </p>
+                </div>
+              )}
+            </div>
 
-          <Button 
-            onClick={handleViewExam} 
-            className="w-full"
-            size="lg"
-          >
-            <FileText className="mr-2" size={20} />
-            Visualizar laudo em PDF
-          </Button>
+            <Button 
+              onClick={handleViewExam} 
+              className="w-full"
+              size="lg"
+            >
+              <FileText className="mr-2" size={20} />
+              Visualizar laudo em PDF
+            </Button>
 
-          <div className="text-center text-sm text-muted-foreground">
-            <p>Clínica Agüera</p>
-            <p className="mt-1">Acesso seguro ao seu documento médico</p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant="outline"
+                onClick={handleCopyLink}
+                className="w-full"
+              >
+                <Copy className="mr-2" size={16} />
+                Copiar link
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={handlePrint}
+                className="w-full"
+              >
+                <Printer className="mr-2" size={16} />
+                Imprimir
+              </Button>
+            </div>
+
+            <div className="text-center text-sm text-muted-foreground pt-4 border-t">
+              <p className="font-medium">Clínica Agüera</p>
+              <p className="mt-1">Acesso seguro ao seu documento médico</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <style>{`
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          .print-content, .print-content * {
+            visibility: visible;
+          }
+          .print-content {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+          }
+        }
+      `}</style>
+    </>
   );
 }
