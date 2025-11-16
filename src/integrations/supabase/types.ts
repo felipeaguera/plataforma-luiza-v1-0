@@ -98,6 +98,47 @@ export type Database = {
         }
         Relationships: []
       }
+      document_shares: {
+        Row: {
+          created_at: string
+          documento_id: string
+          expires_at: string | null
+          id: string
+          last_view_at: string | null
+          revogado_em: string | null
+          token: string
+          view_count: number
+        }
+        Insert: {
+          created_at?: string
+          documento_id: string
+          expires_at?: string | null
+          id?: string
+          last_view_at?: string | null
+          revogado_em?: string | null
+          token: string
+          view_count?: number
+        }
+        Update: {
+          created_at?: string
+          documento_id?: string
+          expires_at?: string | null
+          id?: string
+          last_view_at?: string | null
+          revogado_em?: string | null
+          token?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_shares_documento_id_fkey"
+            columns: ["documento_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exams: {
         Row: {
           created_at: string | null
@@ -345,12 +386,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_exam_share: {
+        Args: { exam_id: string }
+        Returns: {
+          share_id: string
+          share_token: string
+        }[]
+      }
+      generate_share_token: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_share_view: {
+        Args: { share_token: string }
+        Returns: undefined
       }
     }
     Enums: {

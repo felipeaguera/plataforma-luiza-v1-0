@@ -15,6 +15,7 @@ import ClinicNewsPage from "./pages/admin/ClinicNews";
 import PatientLogin from "./pages/patient/Login";
 import PatientPortal from "./pages/patient/Portal";
 import PatientActivate from "./pages/patient/Activate";
+import ExamShare from "./pages/ExamShare";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,8 @@ const App = () => (
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/paciente/login" element={<PatientLogin />} />
             <Route path="/paciente/ativar" element={<PatientActivate />} />
+            {/* Public exam share route */}
+            <Route path="/r/:token" element={<ExamShare />} />
             <Route 
               path="/paciente/portal" 
               element={
