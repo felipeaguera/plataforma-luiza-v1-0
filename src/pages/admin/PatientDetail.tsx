@@ -64,7 +64,7 @@ export default function PatientDetail() {
           <PatientGeneralInfo patient={patient} />
 
           {/* Exams Section */}
-          <PatientExams patientId={patient.id} />
+          <PatientExams patientId={patient.id} patientName={patient.full_name} />
 
           {/* Recommendations Section */}
           <PatientRecommendations patientId={patient.id} />

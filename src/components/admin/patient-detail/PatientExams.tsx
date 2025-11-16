@@ -10,12 +10,14 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ExamDialog } from './ExamDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { ExamShareBlock } from './ExamShareBlock';
 
 interface PatientExamsProps {
   patientId: string;
+  patientName: string;
 }
 
-export function PatientExams({ patientId }: PatientExamsProps) {
+export function PatientExams({ patientId, patientName }: PatientExamsProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [examToDelete, setExamToDelete] = useState<string | null>(null);
   const queryClient = useQueryClient();
@@ -182,6 +184,16 @@ export function PatientExams({ patientId }: PatientExamsProps) {
                         <Trash2 size={18} />
                       </Button>
                     </div>
+                  </div>
+                  
+                  {/* QR Code Share Block */}
+                  <div className="mt-4 pt-4 border-t">
+                    <ExamShareBlock 
+                      examId={exam.id}
+                      examTitle={exam.title}
+                      examDate={exam.exam_date}
+                      patientName={patientName}
+                    />
                   </div>
                 </div>
               ))}
