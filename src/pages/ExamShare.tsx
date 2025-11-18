@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, AlertCircle, Copy, Printer } from 'lucide-react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import logoAguera from '@/assets/logo-aguera-full.jpeg';
 
 export default function ExamShare() {
   const { token } = useParams<{ token: string }>();
@@ -103,27 +104,27 @@ export default function ExamShare() {
   return (
     <>
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="max-w-md w-full print-content">
+        <Card className="max-w-lg w-full print-content">
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
               <img 
-                src="/logo-aguera.jpeg" 
-                alt="Clínica Agüera" 
-                className="h-20 object-contain"
+                src={logoAguera}
+                alt="Clínica Agüera Dermatologia" 
+                className="h-24 object-contain"
               />
             </div>
-            <CardTitle className="text-2xl">Acesso ao seu laudo</CardTitle>
+            <CardTitle className="text-xl font-bold tracking-wide">AGÜERA DERMATOLOGIA</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+            <div className="bg-muted/50 rounded-lg p-6 space-y-3 border">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Exame:</p>
-                <p className="text-lg font-medium">{shareData.exams.title}</p>
+                <p className="text-lg font-semibold">{shareData.exams.title}</p>
               </div>
               {shareData.exams.exam_date && (
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Data do exame:</p>
-                  <p className="text-lg font-medium">
+                  <p className="text-lg font-semibold">
                     {new Date(shareData.exams.exam_date + 'T00:00:00').toLocaleDateString('pt-BR')}
                   </p>
                 </div>
@@ -141,27 +142,28 @@ export default function ExamShare() {
 
             <div className="grid grid-cols-2 gap-2">
               <Button
-                variant="outline"
+                variant="default"
                 onClick={handleCopyLink}
                 className="w-full"
+                size="lg"
               >
-                <Copy className="mr-2" size={16} />
+                <Copy className="mr-2" size={18} />
                 Copiar link
               </Button>
               
               <Button
-                variant="outline"
+                variant="default"
                 onClick={handlePrint}
                 className="w-full"
+                size="lg"
               >
-                <Printer className="mr-2" size={16} />
+                <Printer className="mr-2" size={18} />
                 Imprimir
               </Button>
             </div>
 
             <div className="text-center text-sm text-muted-foreground pt-4 border-t">
-              <p className="font-medium">Clínica Agüera</p>
-              <p className="mt-1">Acesso seguro ao seu documento médico</p>
+              <p className="font-medium">Acesso seguro ao seu documento médico</p>
             </div>
           </CardContent>
         </Card>
