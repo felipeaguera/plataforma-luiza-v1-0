@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
-import { Copy, RefreshCw, Printer, ExternalLink, QrCode, AlertCircle } from 'lucide-react';
+import { Copy, Printer, ExternalLink, QrCode, AlertCircle } from 'lucide-react';
 import { useExamShare } from '@/hooks/useExamShares';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import logoAguera from '@/assets/logo-aguera-full.jpeg';
@@ -124,11 +124,6 @@ export function ExamShareDialog({
                 Imprimir
               </Button>
 
-              <Button onClick={() => createShare.mutate()} variant="outline" size="lg" disabled={createShare.isPending}>
-                <RefreshCw className={`mr-2 ${createShare.isPending ? 'animate-spin' : ''}`} size={18} />
-                Gerar novo link
-              </Button>
-
               <Button onClick={handleWhatsApp} variant="outline" size="lg">
                 <ExternalLink className="mr-2" size={18} />
                 WhatsApp
@@ -146,10 +141,15 @@ export function ExamShareDialog({
             visibility: visible;
           }
           #print-content {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 20px !important;
+          }
+          .print\\:hidden {
+            display: none !important;
           }
         }
       `}</style>

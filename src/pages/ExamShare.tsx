@@ -16,10 +16,10 @@ export default function ExamShare() {
     queryFn: async () => {
       if (!token) throw new Error('Token não fornecido');
 
-      // Get the share record
+      // Get the share record first
       const { data: share, error: shareError } = await supabase
         .from('document_shares')
-        .select('*, exams(*)')
+        .select('*')
         .eq('token', token)
         .is('revogado_em', null)
         .single();
@@ -31,7 +31,16 @@ export default function ExamShare() {
         throw new Error('Link expirado');
       }
 
-      return share;
+      // Then get the exam data separately
+      const { data: exam, error: examError } = await supabase
+        .from('exams')
+        .select('*')
+        .eq('id', share.documento_id)
+        .single();
+
+      if (examError) throw examError;
+
+      return { ...share, exams: exam };
     },
   });
 
@@ -171,6 +180,10 @@ export default function ExamShare() {
 
       <style>{`
         @media print {
+          @page {
+            size: A4;
+            margin: 0;
+          }
           body * {
             visibility: hidden;
           }
@@ -178,10 +191,16 @@ export default function ExamShare() {
             visibility: visible;
           }
           .print-content {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 40px !important;
+            background: white !important;
+          }
+          button {
+            display: none !important;
           }
         }
       `}</style>
