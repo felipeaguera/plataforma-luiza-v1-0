@@ -5,18 +5,26 @@ import { Copy, RefreshCw, Printer, ExternalLink, QrCode, AlertCircle } from 'luc
 import { useExamShare } from '@/hooks/useExamShares';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import logoAguera from '@/assets/logo-aguera-full.jpeg';
-
 interface ExamShareDialogProps {
   examId: string;
   examTitle: string;
   examDate: string | null;
   patientName: string;
 }
-
-export function ExamShareDialog({ examId, examTitle, examDate, patientName }: ExamShareDialogProps) {
-  const { share, isLoading, createShare, getShareUrl, copyShareUrl } = useExamShare(examId);
+export function ExamShareDialog({
+  examId,
+  examTitle,
+  examDate,
+  patientName
+}: ExamShareDialogProps) {
+  const {
+    share,
+    isLoading,
+    createShare,
+    getShareUrl,
+    copyShareUrl
+  } = useExamShare(examId);
   const [isOpen, setIsOpen] = useState(false);
-
   const handleOpenDialog = async () => {
     // Se não há share, criar primeiro antes de abrir o dialog
     if (!share && !isLoading && !createShare.isPending) {
@@ -32,7 +40,6 @@ export function ExamShareDialog({ examId, examTitle, examDate, patientName }: Ex
       setIsOpen(true);
     }
   };
-
   const handleWhatsApp = () => {
     if (!share) return;
     const shareUrl = getShareUrl(share.token);
@@ -40,20 +47,12 @@ export function ExamShareDialog({ examId, examTitle, examDate, patientName }: Ex
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
-
   const handlePrint = () => {
     window.print();
   };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+  return <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleOpenDialog}
-          title="QR Code"
-        >
+        <Button variant="ghost" size="icon" onClick={handleOpenDialog} title="QR Code">
           <QrCode size={18} />
         </Button>
       </DialogTrigger>
@@ -63,15 +62,12 @@ export function ExamShareDialog({ examId, examTitle, examDate, patientName }: Ex
           <DialogTitle>Acesso rápido ao laudo</DialogTitle>
         </DialogHeader>
         
-        {isLoading || createShare.isPending || !share ? (
-          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+        {isLoading || createShare.isPending || !share ? <div className="flex flex-col items-center justify-center py-8 space-y-4">
             <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
             <p className="text-sm text-muted-foreground">
               {createShare.isPending ? 'Gerando link de acesso...' : 'Carregando...'}
             </p>
-          </div>
-        ) : createShare.isError ? (
-          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+          </div> : createShare.isError ? <div className="flex flex-col items-center justify-center py-8 space-y-4">
             <AlertCircle className="w-12 h-12 text-destructive" />
             <p className="text-sm text-center text-muted-foreground max-w-md">
               Não foi possível gerar o QR Code. Tente novamente ou contate o suporte.
@@ -79,20 +75,14 @@ export function ExamShareDialog({ examId, examTitle, examDate, patientName }: Ex
             <Button onClick={() => createShare.mutate()} variant="outline">
               Tentar novamente
             </Button>
-          </div>
-        ) : (
-          <>
+          </div> : <>
             <div id="print-content" className="space-y-6 py-4">
               <div className="flex justify-center">
-                <img 
-                  src={logoAguera}
-                  alt="Clínica Agüera Dermatologia" 
-                  className="h-24 object-contain"
-                />
+                <img src={logoAguera} alt="Clínica Agüera Dermatologia" className="h-24 object-contain" />
               </div>
 
               <div className="text-center space-y-1">
-                <h2 className="text-xl font-bold tracking-wide">AGÜERA DERMATOLOGIA</h2>
+                <h2 className="text-xl font-bold tracking-wide">AGUERA DERMATOLOGIA</h2>
               </div>
 
               <div className="space-y-3 bg-muted/30 p-6 rounded-lg border">
@@ -100,14 +90,12 @@ export function ExamShareDialog({ examId, examTitle, examDate, patientName }: Ex
                   <p className="text-sm font-medium text-muted-foreground">Paciente:</p>
                   <p className="text-lg font-semibold">{patientName}</p>
                 </div>
-                {examDate && (
-                  <div>
+                {examDate && <div>
                     <p className="text-sm font-medium text-muted-foreground">Data do exame:</p>
                     <p className="text-lg font-semibold">
                       {new Date(examDate + 'T00:00:00').toLocaleDateString('pt-BR')}
                     </p>
-                  </div>
-                )}
+                  </div>}
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Exame:</p>
                   <p className="text-lg font-semibold">{examTitle}</p>
@@ -116,12 +104,7 @@ export function ExamShareDialog({ examId, examTitle, examDate, patientName }: Ex
 
               <div className="flex justify-center py-6">
                 <div className="bg-white p-6 rounded-lg shadow-md border-2">
-                  <QRCodeSVG 
-                    value={getShareUrl(share.token)}
-                    size={220}
-                    level="H"
-                    includeMargin
-                  />
+                  <QRCodeSVG value={getShareUrl(share.token)} size={220} level="H" includeMargin />
                 </div>
               </div>
 
@@ -131,45 +114,27 @@ export function ExamShareDialog({ examId, examTitle, examDate, patientName }: Ex
             </div>
 
             <div className="flex flex-wrap gap-2 justify-center pt-4 print:hidden border-t">
-              <Button
-                onClick={() => copyShareUrl(share.token)}
-                variant="default"
-                size="lg"
-              >
+              <Button onClick={() => copyShareUrl(share.token)} variant="default" size="lg">
                 <Copy className="mr-2" size={18} />
                 Copiar link
               </Button>
 
-              <Button
-                onClick={handlePrint}
-                variant="default"
-                size="lg"
-              >
+              <Button onClick={handlePrint} variant="default" size="lg">
                 <Printer className="mr-2" size={18} />
                 Imprimir
               </Button>
 
-              <Button
-                onClick={() => createShare.mutate()}
-                variant="outline"
-                size="lg"
-                disabled={createShare.isPending}
-              >
+              <Button onClick={() => createShare.mutate()} variant="outline" size="lg" disabled={createShare.isPending}>
                 <RefreshCw className={`mr-2 ${createShare.isPending ? 'animate-spin' : ''}`} size={18} />
                 Gerar novo link
               </Button>
 
-              <Button
-                onClick={handleWhatsApp}
-                variant="outline"
-                size="lg"
-              >
+              <Button onClick={handleWhatsApp} variant="outline" size="lg">
                 <ExternalLink className="mr-2" size={18} />
                 WhatsApp
               </Button>
             </div>
-          </>
-        )}
+          </>}
       </DialogContent>
 
       <style>{`
@@ -188,6 +153,5 @@ export function ExamShareDialog({ examId, examTitle, examDate, patientName }: Ex
           }
         }
       `}</style>
-    </Dialog>
-  );
+    </Dialog>;
 }
