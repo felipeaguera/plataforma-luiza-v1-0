@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Copy, RefreshCw, Printer, ExternalLink, QrCode, AlertCircle } from 'lucide-react';
 import { useExamShare } from '@/hooks/useExamShares';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import logoAguera from '@/assets/logo-aguera-full.jpeg';
 
 interface ExamShareDialogProps {
   examId: string;
@@ -84,93 +85,86 @@ export function ExamShareDialog({ examId, examTitle, examDate, patientName }: Ex
             <div id="print-content" className="space-y-6 py-4">
               <div className="flex justify-center">
                 <img 
-                  src="/logo-aguera.jpeg" 
-                  alt="Clínica Agüera" 
-                  className="h-20 object-contain"
+                  src={logoAguera}
+                  alt="Clínica Agüera Dermatologia" 
+                  className="h-24 object-contain"
                 />
               </div>
 
-              <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold">Clínica Agüera</h2>
-                <p className="text-lg text-muted-foreground">Acesso Digital ao Laudo</p>
+              <div className="text-center space-y-1">
+                <h2 className="text-xl font-bold tracking-wide">AGÜERA DERMATOLOGIA</h2>
               </div>
 
-              <div className="space-y-3 bg-muted/30 p-4 rounded-lg">
+              <div className="space-y-3 bg-muted/30 p-6 rounded-lg border">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Paciente:</p>
-                  <p className="text-lg font-medium">{patientName}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Exame:</p>
-                  <p className="text-lg font-medium">{examTitle}</p>
+                  <p className="text-lg font-semibold">{patientName}</p>
                 </div>
                 {examDate && (
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Data do exame:</p>
-                    <p className="text-lg font-medium">
+                    <p className="text-lg font-semibold">
                       {new Date(examDate + 'T00:00:00').toLocaleDateString('pt-BR')}
                     </p>
                   </div>
                 )}
-              </div>
-
-              <div className="flex flex-col items-center space-y-4 py-4">
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                  <QRCodeSVG value={getShareUrl(share.token)} size={240} level="H" />
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Exame:</p>
+                  <p className="text-lg font-semibold">{examTitle}</p>
                 </div>
-                <p className="text-center text-sm text-muted-foreground max-w-md">
-                  Escaneie o QR code com a câmera do seu celular para acessar o laudo digital
-                </p>
               </div>
 
-              <div className="text-center text-xs text-muted-foreground space-y-1 pt-4 border-t">
-                <p>Link de acesso: {getShareUrl(share.token)}</p>
-                <p>Este QR code dá acesso seguro ao laudo médico</p>
+              <div className="flex justify-center py-6">
+                <div className="bg-white p-6 rounded-lg shadow-md border-2">
+                  <QRCodeSVG 
+                    value={getShareUrl(share.token)}
+                    size={220}
+                    level="H"
+                    includeMargin
+                  />
+                </div>
               </div>
 
-              {share.view_count > 0 && (
-                <p className="text-xs text-muted-foreground text-center">
-                  Visualizado {share.view_count} {share.view_count === 1 ? 'vez' : 'vezes'}
-                  {share.last_view_at && ` • Último acesso: ${new Date(share.last_view_at).toLocaleDateString('pt-BR')}`}
-                </p>
-              )}
+              <div className="text-center space-y-2 text-sm text-muted-foreground">
+                <p className="font-medium">Escaneie o QR Code para acessar o laudo</p>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-4">
+            <div className="flex flex-wrap gap-2 justify-center pt-4 print:hidden border-t">
               <Button
-                variant="outline"
-                size="sm"
                 onClick={() => copyShareUrl(share.token)}
+                variant="default"
+                size="lg"
               >
-                <Copy className="mr-2" size={16} />
+                <Copy className="mr-2" size={18} />
                 Copiar link
               </Button>
 
               <Button
-                variant="outline"
-                size="sm"
-                onClick={() => createShare.mutate()}
-                disabled={createShare.isPending}
-              >
-                <RefreshCw className={`mr-2 ${createShare.isPending ? 'animate-spin' : ''}`} size={16} />
-                Novo link
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
                 onClick={handlePrint}
+                variant="default"
+                size="lg"
               >
-                <Printer className="mr-2" size={16} />
+                <Printer className="mr-2" size={18} />
                 Imprimir
               </Button>
 
               <Button
+                onClick={() => createShare.mutate()}
                 variant="outline"
-                size="sm"
-                onClick={handleWhatsApp}
+                size="lg"
+                disabled={createShare.isPending}
               >
-                <ExternalLink className="mr-2" size={16} />
+                <RefreshCw className={`mr-2 ${createShare.isPending ? 'animate-spin' : ''}`} size={18} />
+                Gerar novo link
+              </Button>
+
+              <Button
+                onClick={handleWhatsApp}
+                variant="outline"
+                size="lg"
+              >
+                <ExternalLink className="mr-2" size={18} />
                 WhatsApp
               </Button>
             </div>
