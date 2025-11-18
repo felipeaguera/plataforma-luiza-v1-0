@@ -39,10 +39,10 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
       return;
     }
 
-    // Check file size (50MB limit)
-    const maxSize = 50 * 1024 * 1024; // 50MB in bytes
+    // Check file size (3GB limit)
+    const maxSize = 3 * 1024 * 1024 * 1024; // 3GB in bytes
     if (file.size > maxSize) {
-      toast.error('O arquivo é muito grande. Tamanho máximo: 50MB');
+      toast.error('O arquivo é muito grande. Tamanho máximo: 3GB');
       return;
     }
 
@@ -111,7 +111,7 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
     } catch (error: any) {
       console.error('Error uploading exam:', error);
       if (error?.statusCode === '413' || error?.message?.includes('exceeded')) {
-        toast.error('Arquivo muito grande. Tamanho máximo: 50MB');
+        toast.error('Arquivo muito grande. Tamanho máximo: 3GB');
       } else {
         toast.error('Erro ao adicionar exame');
       }
