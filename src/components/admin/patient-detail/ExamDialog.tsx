@@ -47,7 +47,7 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
       });
       
       const compressedFile = new File(
-        [compressedPdfBytes], 
+        [new Uint8Array(compressedPdfBytes)], 
         file.name, 
         { type: 'application/pdf' }
       );
