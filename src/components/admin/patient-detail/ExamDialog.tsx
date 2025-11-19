@@ -14,6 +14,7 @@ import { Upload, CalendarIcon, FileText, X } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { PDFDocument } from "pdf-lib";
 
 interface ExamDialogProps {
   open: boolean;
@@ -29,8 +30,45 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
+
+  const compressPDF = async (file: File): Promise<File> => {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      
+      // Salvar com configurações de compressão
+      const compressedPdfBytes = await pdfDoc.save({
+        useObjectStreams: true,
+        addDefaultPage: false,
+        objectsPerTick: 50,
+      });
+      
+      const compressedFile = new File(
+        [compressedPdfBytes], 
+        file.name, 
+        { type: 'application/pdf' }
+      );
+      
+      const originalSizeMB = (file.size / 1024 / 1024).toFixed(2);
+      const compressedSizeMB = (compressedFile.size / 1024 / 1024).toFixed(2);
+      const reductionPercent = (((file.size - compressedFile.size) / file.size) * 100).toFixed(1);
+      
+      if (compressedFile.size < file.size) {
+        toast.success(`PDF comprimido: ${originalSizeMB}MB → ${compressedSizeMB}MB (${reductionPercent}% menor)`);
+        return compressedFile;
+      } else {
+        toast.info("PDF já está otimizado, usando arquivo original");
+        return file;
+      }
+    } catch (error) {
+      console.error("Erro ao comprimir PDF:", error);
+      toast.warning("Não foi possível comprimir o PDF, usando arquivo original");
+      return file;
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,29 +77,39 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
       return;
     }
 
-    // Check file size (3GB limit)
-    const maxSize = 3 * 1024 * 1024 * 1024; // 3GB in bytes
-    if (file.size > maxSize) {
-      toast.error("O arquivo é muito grande. Tamanho máximo: 3GB");
-      return;
-    }
-
     setIsUploading(true);
-    setUploadProgress(10);
+    setUploadProgress(5);
 
     try {
-      const fileExt = file.name.split(".").pop();
+      // Comprimir PDF automaticamente
+      setIsCompressing(true);
+      toast.info("Comprimindo PDF...");
+      const compressedFile = await compressPDF(file);
+      setIsCompressing(false);
+      
+      setUploadProgress(20);
+
+      // Check file size after compression (50MB limit - Lovable Cloud)
+      const maxSize = 50 * 1024 * 1024; // 50MB in bytes
+      if (compressedFile.size > maxSize) {
+        toast.error(`Arquivo ainda muito grande após compressão: ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB. Máximo: 50MB`);
+        setIsUploading(false);
+        setUploadProgress(0);
+        return;
+      }
+
+      const fileExt = compressedFile.name.split(".").pop();
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `${patientId}/${fileName}`;
 
-      setUploadProgress(30);
-      const { error: uploadError } = await supabase.storage.from("exams").upload(filePath, file);
+      setUploadProgress(40);
+      const { error: uploadError } = await supabase.storage.from("exams").upload(filePath, compressedFile);
 
-      setUploadProgress(60);
+      setUploadProgress(70);
 
       if (uploadError) throw uploadError;
 
-      setUploadProgress(80);
+      setUploadProgress(85);
       const { data: examData, error: insertError } = await supabase
         .from("exams")
         .insert({
@@ -69,8 +117,8 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
           title,
           description,
           file_path: filePath,
-          file_name: file.name,
-          file_size: file.size,
+          file_name: compressedFile.name,
+          file_size: compressedFile.size,
           exam_date: examDate ? format(examDate, "yyyy-MM-dd") : null,
           published_at: new Date().toISOString(),
         })
@@ -203,7 +251,7 @@ export function ExamDialog({ open, onOpenChange, patientId }: ExamDialogProps) {
           </div>
 
           <div>
-            <Label htmlFor="file">Arquivo PDF * (máx. 3GB)</Label>
+            <Label htmlFor="file">Arquivo PDF * (compressão automática)</Label>
             <div
               className={cn(
                 "mt-2 border-2 border-dashed rounded-lg p-6 transition-all",
